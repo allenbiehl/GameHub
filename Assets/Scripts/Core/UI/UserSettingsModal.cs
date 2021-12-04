@@ -106,7 +106,7 @@ namespace GameHub.Core.UI
             _buttons.CancelButton.onClick.AddListener(Close);
 
             UserInfo userInfo = UserInfoManager.Instance.GetUserInfo();
-            _fields.UsernameField.text = userInfo.UserName;
+            _fields.UsernameField.text = userInfo.Username;
             _fields.LastNameField.text = userInfo.LastName;
             _fields.FirstNameField.text = userInfo.FirstName;
         }
@@ -140,7 +140,7 @@ namespace GameHub.Core.UI
         void SaveSettings(UnityAction onSave)
         {
             UserInfo userInfo = UserInfoManager.Instance.GetUserInfo();
-            userInfo.UserName = _fields.UsernameField.text;  
+            userInfo.Username = _fields.UsernameField.text;  
             userInfo.LastName = _fields.LastNameField.text;  
             userInfo.FirstName = _fields.FirstNameField.text;    
             UserInfoManager.Instance.SaveUserInfo(userInfo);

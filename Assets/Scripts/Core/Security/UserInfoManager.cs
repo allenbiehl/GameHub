@@ -58,7 +58,7 @@ namespace GameHub.Core.Security
         /// </param>
         public void SaveUserInfo(UserInfo userInfo)
         {
-            GameSettingsManager.SaveSettings("UserSettings", userInfo);
+            GameSettingsManager.Instance.SaveSettings("UserSettings", userInfo);
 
             _cachedUserInfo = userInfo;
         }
@@ -74,7 +74,7 @@ namespace GameHub.Core.Security
         /// </returns>
         public UserInfo LoadUserInfo()
         {
-            return GameSettingsManager.LoadSettings<UserInfo>("UserSettings");
+            return GameSettingsManager.Instance.LoadSettings<UserInfo>("UserSettings");
         }
 
         /// <summary>
