@@ -3,65 +3,83 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using GameHub.Core.Util;
 
 namespace GameHub.Core.UI
 {
     /// <summary>
-    /// 
+    /// Class <c>GamesPanel</c> represents the main menu, UI panel that displays all 
+    /// game configurations available to play in game hub.
     /// </summary>
     public class GamesPanel : MonoBehaviour
     {
-        private List<GameConfig> _gameConfigs;
+        /// <summary>
+        /// Instance variable <c>_gameConfigs</c> is the list of game configurations 
+        /// available to play and is cached to speed up search performance.
+        /// </summary>
+        private List<GameConfig> _gameConfigs = new List<GameConfig>();
 
-        public Material gameObjectMaterial;
+        /// <summary>
+        /// Instance variable <c>_gameObjectMaterial</c> is the game material 
+        /// associated with the game icon.
+        /// </summary>
+        [SerializeField]
+        private Material _gameObjectMaterial;
 
-        //private Texture2D _cursorTexture;
+        /// <summary>
+        /// Instance variable <c>_gameListBody</c> is the content area where we render
+        /// the list of available game configurations.
+        /// </summary>
+        [SerializeField]
+        private RectTransform _gameListBody;
 
-        private void Awake()
+        /// <summary>
+        /// Method <c>Start</c> is used to intialize the <c>GamePanel</c>.
+        /// </summary>
+        public void Start()
         {
-            TMP_InputField searchField = ComponentUtil.FindComponent<TMP_InputField>("SearchField", this);
+            List<GameConfig> gameSource = GameConfigLoader.Instance.Load();
 
-            if (searchField)
+            if (gameSource != null)
             {
-                searchField.onValueChanged.AddListener(OnSearchValueChange);
+                _gameConfigs = gameSource;  
+                LoadGameList(_gameConfigs);
             }
-
-            // TODO Cache resources on app startup
-            // dalays scene load
-            //cursorTexture = CursorLoader.Load(CursorType.HandPointer);
-
-            // TODO Cache game configs on startup
-            // dalays scene load
-            _gameConfigs = GameConfigLoader.Load();
-
-            LoadGameList(_gameConfigs);
         }
 
-        private void OnSearchValueChange(string value)
+        /// <summary>
+        /// Method <c>OnSearchValueChanged</c> is executed when the user enters search criteria in 
+        /// the search field. If the search field is empty, then we display all game configurations,
+        /// otherwise we performance an uppercase pattern match that matches if the game config name
+        /// contains the search criteria.
+        /// </summary>
+        /// <param name="value">
+        /// <c>input</c> is search field that contains the value to match against.
+        /// </param>
+        public void OnSearchValueChange(TMP_InputField input)
         {
-            if (value == "")
+            if (input == null || input.text == "")
             {
                 LoadGameList(_gameConfigs);
             }
             else
             {
                 List<GameConfig> filteredConfigs = _gameConfigs
-                    .Where(config => config.Name.ToUpper().Contains(value.ToUpper()))
+                    .Where(config => config.Name.ToUpper().Contains(input.text.ToUpper()))
                     .ToList();
 
                 LoadGameList(filteredConfigs);
             }
-
         }
 
+        /// <summary>
+        /// Method <c>ClearGameList</c> is used to clear all game configuration rows from the game 
+        /// list content area.
+        /// </summary>
         private void ClearGameList()
         {
-            RectTransform gameListBody = ComponentUtil.FindComponent<RectTransform>("GameList/Body", this);
-
-            if (gameListBody && gameListBody.childCount > 0)
+            if (_gameListBody && _gameListBody.childCount > 0)
             {
-                foreach (Transform child in gameListBody.transform)
+                foreach (Transform child in _gameListBody.transform)
                 {
                     Destroy(child.gameObject);
                 }
@@ -69,20 +87,20 @@ namespace GameHub.Core.UI
         }
 
         /// <summary>
-        /// 
+        /// Method <c>LoadGameList</c> is used to load the specified list of game configurations.
+        /// When this method is executed, the existing game list is first cleared and then the 
+        /// new list of game configs is rendered.
         /// </summary>
         /// <param name="gameConfigs"></param>
         private void LoadGameList(List<GameConfig> gameConfigs)
         {
-            RectTransform gameListBody = ComponentUtil.FindComponent<RectTransform>("GameList/Body", this);
-            
-            if (gameListBody && gameConfigs != null)
+            if (_gameListBody && gameConfigs != null)
             {
                 ClearGameList();
 
                 Font arial = Resources.GetBuiltinResource<Font>("Arial.ttf");
-                float listWidth = gameListBody.sizeDelta.x;
-                float listHeight = gameListBody.sizeDelta.y;
+                float listWidth = _gameListBody.sizeDelta.x;
+                float listHeight = _gameListBody.sizeDelta.y;
                 float rowHeight = 50;
 
                 for (int i = 0; i < gameConfigs.Count; i++)
@@ -94,7 +112,7 @@ namespace GameHub.Core.UI
                     float rowLocY = (listHeight / 2) - (rowHeight / 2) - (i * rowHeight);
 
                     GameObject gameListRow = new GameObject($"GameListRow{i}", typeof(RectTransform));
-                    gameListRow.transform.SetParent(gameListBody, false);
+                    gameListRow.transform.SetParent(_gameListBody, false);
                     RectTransform row = gameListRow.GetComponent<RectTransform>();
                     row.sizeDelta = new Vector2(listWidth, rowHeight);
                     row.transform.localPosition = new Vector2(rowLocX, rowLocY);
@@ -103,7 +121,6 @@ namespace GameHub.Core.UI
                     HoverImage image = gameListRow.AddComponent<HoverImage>();
                     image.color = Color.clear;
                     image.hoverColor = new Color(.2f, .2f, .2f, 1);
-                    //image.cursorTexture = cursorTexture;
 
                     Button menuBtn = gameListRow.AddComponent<Button>();
                     menuBtn.onClick.AddListener(() => SceneLoader.Instance.Load(config.Scene, true));
@@ -137,8 +154,10 @@ namespace GameHub.Core.UI
                     // Calculate the offset based on the icon cell header.
                     icon.transform.localPosition = new Vector2(-250, 0);
                     icon.rectTransform.sizeDelta = new Vector2(25, 25);
-                    icon.material = gameObjectMaterial;
-
+                    if (_gameObjectMaterial)
+                    {
+                        icon.material = _gameObjectMaterial;
+                    }
                     if (config.Icon != null)
                     {
                         icon.sprite = config.Icon;
