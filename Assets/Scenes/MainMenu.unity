@@ -1987,6 +1987,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 898622bc95b366143832694c5aee652c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _avatarText: {fileID: 378681267}
 --- !u!1 &1087415157
 GameObject:
   m_ObjectHideFlags: 0
@@ -2506,7 +2507,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1227588801}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1062346993}
+        m_TargetAssemblyTypeName: GameHub.Core.UI.MenuPanel, Assembly-CSharp
+        m_MethodName: OnEditSettings
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1227588801
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3951,11 +3964,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a20c94cf2f39244d8c9f52ef3290d41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  usernameField: {fileID: 212347928}
-  lastNameField: {fileID: 1490453873}
-  firstNameField: {fileID: 263018299}
-  saveButton: {fileID: 1127045612}
-  cancelButton: {fileID: 1331654632}
+  _fields:
+    UsernameField: {fileID: 212347928}
+    LastNameField: {fileID: 1490453873}
+    FirstNameField: {fileID: 263018299}
+  _buttons:
+    CancelButton: {fileID: 1331654632}
+    SaveButton: {fileID: 1127045612}
 --- !u!1 &1798473913
 GameObject:
   m_ObjectHideFlags: 0
