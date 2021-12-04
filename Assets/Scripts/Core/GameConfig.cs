@@ -8,17 +8,17 @@ namespace GameHub.Core
     public class GameConfig
     {
         /// <summary>
-        /// Instance variable <c>Name</c> stores the game name.
+        /// Instance property <c>Name</c> stores the game name.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Instance variable <c>Scene</c> stores the game scene name.
+        /// Instance property <c>Scene</c> stores the game scene name.
         /// </summary>
         public string Scene { get; set; }
 
         /// <summary>
-        /// Instance variable <c>Icon</c> stores the game icon.
+        /// Instance property <c>Icon</c> stores the game icon.
         /// </summary>
         public Sprite Icon { get; set; }
 
