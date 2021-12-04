@@ -114,7 +114,7 @@ namespace GameHub.Games.TicTacToe2D.UI
         private void NewGame()
         {
             GameManager manager = GameManager.Instance;
-            PlayerSettings settings = PlayerSettingsManager.GetSettings();
+            PlayerSettings settings = PlayerSettingsManager.Instance.GetSettings();
 
             GameBoard gameBoard = new GameBoard(settings.BoardSize);
             GameState gameState = manager.InitializeGame(gameBoard, settings.LengthToWin);
