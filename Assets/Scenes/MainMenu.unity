@@ -853,7 +853,19 @@ MonoBehaviour:
       m_Calls: []
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 698326914}
+        m_TargetAssemblyTypeName: GameHub.Core.UI.GamesPanel, Assembly-CSharp
+        m_MethodName: OnSearchValueChange
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 434175615}
+          m_ObjectArgumentAssemblyTypeName: TMPro.TMP_InputField, Unity.TextMeshPro
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_OnTouchScreenKeyboardStatusChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1322,7 +1334,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c98b3ffde5b57f24290be0c4de54917d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameObjectMaterial: {fileID: 2100000, guid: e3265ab4bf004d28a9537516768c1c75, type: 3}
+  _gameObjectMaterial: {fileID: 2100000, guid: e3265ab4bf004d28a9537516768c1c75, type: 3}
+  _gameListBody: {fileID: 749275387}
 --- !u!1 &699114847
 GameObject:
   m_ObjectHideFlags: 0
