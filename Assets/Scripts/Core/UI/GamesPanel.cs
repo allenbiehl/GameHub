@@ -106,7 +106,7 @@ namespace GameHub.Core.UI
                     //image.cursorTexture = cursorTexture;
 
                     Button menuBtn = gameListRow.AddComponent<Button>();
-                    menuBtn.onClick.AddListener(() => SceneLoader.Load(config.Scene, true));
+                    menuBtn.onClick.AddListener(() => SceneLoader.Instance.Load(config.Scene, true));
 
                     // Add Name cell
                     GameObject nameCell = new GameObject($"GameListRow{i}Name");

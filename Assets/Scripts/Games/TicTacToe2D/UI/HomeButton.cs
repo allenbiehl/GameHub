@@ -13,7 +13,7 @@ namespace GameHub.Games.TicTacToe2D.UI
 
             if (button)
             {
-                button.onClick.AddListener(() => SceneLoader.LoadMainMenu());
+                button.onClick.AddListener(() => SceneLoader.Instance.LoadMainMenu());
             }
         }
     }

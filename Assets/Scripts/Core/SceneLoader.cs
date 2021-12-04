@@ -8,14 +8,40 @@ namespace GameHub.Core
     /// Class <c>SceneLoader</c> </c> provides ability to switch
     /// between two scenes using an intermediary loader scene.
     /// </summary>
-    public static class SceneLoader
+    public class SceneLoader
     {
+        /// <summary>
+        /// Instance variable <c>_instance</c> stores the <c>SceneLoader</c>
+        /// singleton instance.
+        /// </summary>
+        private static readonly Lazy<SceneLoader> _instance =
+            new Lazy<SceneLoader>(() => new SceneLoader());
+
+        /// <summary>
+        /// Method <c>Instance</c> returns the <c>SceneLoader</c> singleton 
+        /// instance.
+        /// </summary>
+        public static SceneLoader Instance
+        {
+            get
+            {
+                return _instance.Value;
+            }
+        }
+
+        /// <summary>
+        /// Private constructor to ensure the <c>SceneLoader</c> cannot 
+        /// be instantiated externally.
+        /// </summary>
+        private SceneLoader()
+        {
+        }
 
         /// <summary>
         /// Instance variable <c>_onLoaderCallback</c> represents
         /// a callback that loads the intended view.
         /// </summary>
-        private static Action _onLoaderCallback;
+        private Action _onLoaderCallback;
 
         /// <summary>
         /// Property <c>Scene</c> provides a static list of 
@@ -38,7 +64,7 @@ namespace GameHub.Core
         /// <c>transition</c> represents whether the intermediary loading 
         /// scene should be loaded before the target scene.
         /// </param>
-        public static void Load(Scene scene, bool transition = false)
+        public void Load(Scene scene, bool transition = false)
         {
             Load(scene.ToString(), transition);
         }
@@ -53,7 +79,7 @@ namespace GameHub.Core
         /// <c>transition</c> represents whether the intermediary loading 
         /// scene should be loaded before the target scene.
         /// </param>
-        public static void Load(string scene, bool transition = false)
+        public void Load(string scene, bool transition = false)
         {
             int sceneIndex = SceneUtility.GetBuildIndexByScenePath($"Scenes/{scene}");
             if (sceneIndex >= 0)
@@ -80,7 +106,7 @@ namespace GameHub.Core
         /// <param name="scene">
         /// <c>scene</c> represents the standard scene to load
         /// </param>
-        public static void LoadMainMenu()
+        public void LoadMainMenu()
         {
             Load(Scene.MainMenu);
         }
@@ -90,7 +116,7 @@ namespace GameHub.Core
         /// scene when loading is completed and is ready to switch to
         /// the target scene.
         /// </summary>
-        public static void LoaderCallback()
+        public void LoaderCallback()
         {
             if (_onLoaderCallback != null)
             {
@@ -116,7 +142,7 @@ namespace GameHub.Core
         /// <c>callback</c> represents the callback function to execute after
         /// the delay completes.
         /// </param>
-        private static async void ExecuteDelayedCallback(int seconds, Action callback)
+        private async void ExecuteDelayedCallback(int seconds, Action callback)
         {
             await Task.Delay(TimeSpan.FromSeconds(seconds));
             callback();
