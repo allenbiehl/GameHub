@@ -93,7 +93,7 @@ namespace GameHub.Games.TicTacToe2D.UI
             cancelButton.onClick.RemoveAllListeners();
             cancelButton.onClick.AddListener(Close);
 
-            PlayerSettings playerSettings = PlayerSettingsManager.GetSettings();
+            PlayerSettings playerSettings = PlayerSettingsManager.Instance.GetSettings();
 
             opponentDropdown.value = opponentDropdown.options
                 .FindIndex(option => option.text == playerSettings.Opponent);
@@ -117,20 +117,20 @@ namespace GameHub.Games.TicTacToe2D.UI
 
         void SaveSettings()
         {
-            PlayerSettings settings = PlayerSettingsManager.GetSettings();
+            PlayerSettings settings = PlayerSettingsManager.Instance.GetSettings();
             settings.Opponent = opponentDropdown.options[opponentDropdown.value].text;
             settings.LengthToWin = Int32.Parse(winLengthDropdown.options[winLengthDropdown.value].text);
             settings.BoardSize = Int32.Parse(boardSizeDropdown.options[boardSizeDropdown.value].text);
-            PlayerSettingsManager.SaveSettings(settings);
+            PlayerSettingsManager.Instance.SaveSettings(settings);
         }
 
         void StartSeries()
         {
-            PlayerSettings settings = PlayerSettingsManager.GetSettings();
+            PlayerSettings settings = PlayerSettingsManager.Instance.GetSettings();
 
             IPlayer player1 = new HumanPlayer(
                 UserInfoManager.GetUserInfo(),
-                PlayerSettingsManager.GetSettings()
+                PlayerSettingsManager.Instance.GetSettings()
             );
 
             IPlayer player2;

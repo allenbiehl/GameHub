@@ -83,7 +83,7 @@ namespace GameHub.Games.TicTacToe2D.UI
             noButton.onClick.RemoveAllListeners();
             noButton.onClick.AddListener(Close);
 
-            PlayerSettings playerSettings = PlayerSettingsManager.GetSettings();
+            PlayerSettings playerSettings = PlayerSettingsManager.Instance.GetSettings();
 
             winLengthDropdown.value = winLengthDropdown.options
                 .FindIndex(option => option.text == playerSettings.LengthToWin.ToString());
@@ -104,10 +104,10 @@ namespace GameHub.Games.TicTacToe2D.UI
 
         void SaveSettings(UnityAction onSave)
         {
-            PlayerSettings settings = PlayerSettingsManager.GetSettings();
+            PlayerSettings settings = PlayerSettingsManager.Instance.GetSettings();
             settings.LengthToWin = Int32.Parse(winLengthDropdown.options[winLengthDropdown.value].text);
             settings.BoardSize = Int32.Parse(boardSizeDropdown.options[boardSizeDropdown.value].text);
-            PlayerSettingsManager.SaveSettings(settings);
+            PlayerSettingsManager.Instance.SaveSettings(settings);
 
             onSave.Invoke();
         }

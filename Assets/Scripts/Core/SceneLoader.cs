@@ -28,6 +28,8 @@ namespace GameHub.Core
             Loading
         }
 
+        public Instance 
+
         /// <summary>
         /// Method <c>Load</c> is used to load standard scenes defined
         /// in the <c>Scene</c> enumeration.
