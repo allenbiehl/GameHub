@@ -1,5 +1,7 @@
 using System;
+using System.IO;
 using GameHub.Core;
+using UnityEngine;
 
 namespace GameHub.Games.TicTacToe2D
 {
@@ -67,7 +69,7 @@ namespace GameHub.Games.TicTacToe2D
                 return;
             }
 
-            GameSettingsManager.SaveSettings("TicTacToe2D", settings);
+            GameSettingsManager.Instance.SaveSettings("TicTacToe2D", settings);
 
             _cachedSettings = settings;
         }
@@ -83,7 +85,7 @@ namespace GameHub.Games.TicTacToe2D
         /// </returns>
         public PlayerSettings LoadSettings()
         {
-            return GameSettingsManager.LoadSettings<PlayerSettings>("TicTacToe2D");
+            return GameSettingsManager.Instance.LoadSettings<PlayerSettings>("TicTacToe2D");
         }
 
         /// <summary>

@@ -12,46 +12,63 @@ namespace GameHub.Core.Security
     public class UserInfo
     {
         /// <summary>
-        /// Instance variable <c>_lastName</c> stores the user's last name.
+        /// Instance variable <c>_id</c> stores the user's id. We store
+        /// the variables separately for json serialization as we cannot serialize
+        /// properties.
         /// </summary>
+        [SerializeField]
+        private string _id;
+
+        /// <summary>
+        /// Instance variable <c>_lastName</c> stores the user's last name. We store
+        /// the variables separately for json serialization as we cannot serialize
+        /// properties.
+        /// </summary>
+        [SerializeField]
         private string _lastName;
 
         /// <summary>
-        /// Instance variable <c>_firstName</c> stores the user's first name.
+        /// Instance variable <c>_firstName</c> stores the user's first name. We store
+        /// the variables separately for json serialization as we cannot serialize
+        /// property values.
         /// </summary>
+        [SerializeField]
         private string _firstName;
+
+        /// <summary>
+        /// Instance variable <c>_username</c> stores the user's username. We store
+        /// the variables separately for json serialization as we cannot serialize
+        /// properties.
+        /// </summary>
+        [SerializeField]
+        private string _username;
+
+        /// <summary>
+        /// Instance variable <c>_initials</c> stores the user's initials. We store
+        /// the variables separately for json serialization as we cannot serialize
+        /// properties.
+        /// </summary>
+        [SerializeField]
+        private string _initials;
 
         /// <summary>
         /// Instance property <c>Id</c> stores the user's unique user id. 
         /// </summary>
-        public string Id { get; set; }
-
-        /// <summary>
-        /// Instance property <c>UserName</c> stores the user's unique user name. 
-        /// </summary>
-        public string UserName { get; set; }
-
-        /// <summary>
-        /// Instance property <c>FirstName</c> provides an interface for retrieving
-        /// the _firstName instance variable as well as setting the _firstName instance
-        /// variable. When the first name is updated, we also update the user's initials.
-        /// </summary>
-        public string FirstName {
+        public string Id
+        {
             get
             {
-                return _firstName;
+                return _id;
             }
             set
             {
-                _firstName = value;
-                SetInitials();
+                _id = value;
             }
         }
 
         /// <summary>
-        /// Instance property <c>LastName</c> provides an interface for retrieving
-        /// the _lastName instance variable as well as setting the _lastName instance
-        /// variable. When the last name is updated, we also update the user's initials.
+        /// Instance property <c>LastName</c> stores the user's last name. When the 
+        /// last name is updated, we also update the user's initials.
         /// </summary>
         public string LastName
         {
@@ -67,10 +84,52 @@ namespace GameHub.Core.Security
         }
 
         /// <summary>
+        /// Instance property <c>FirstName</c> stores the user's first name. When the 
+        /// last name is updated, we also update the user's initials.
+        /// </summary>
+        public string FirstName
+        {
+            get
+            {
+                return _firstName;
+            }
+            set
+            {
+                _firstName = value;
+                SetInitials();
+            }
+        }
+
+        /// <summary>
+        /// Instance property <c>UserName</c> stores the user's unique user name. 
+        /// </summary>
+        public string Username
+        {
+            get
+            {
+                return _username;
+            }
+            set
+            {
+                _username = value;
+            }
+        }
+
+        /// <summary>
         /// Instance property <c>Initials</c> stores the user's initials that are derived
         /// from the user's first and last name. 
         /// </summary>
-        public string Initials { get; set; }
+        public string Initials
+        {
+            get
+            {
+                return _initials;
+            }
+            set
+            {
+                _initials = value;
+            }
+        }
 
         /// <summary>
         /// Public constructor with no params required for instantiating an instance of
@@ -86,7 +145,7 @@ namespace GameHub.Core.Security
         public UserInfo( string id, string username, string firstName, string lastName )
         {
             Id = id;
-            UserName = username;
+            Username = username;
             FirstName = firstName;
             LastName = lastName;    
             SetInitials();
