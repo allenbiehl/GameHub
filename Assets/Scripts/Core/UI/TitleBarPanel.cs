@@ -1,26 +1,21 @@
 using UnityEngine;
-using UnityEngine.UI;
-using GameHub.Core.Util;
-
+s
 namespace GameHub.Core.UI
 {
+    /// <summary>
+    /// Class <c>TitleBarPanel</c> is a prefab that is used across all scenes
+    /// that require a title bar. This includes the logo, page title, and an
+    /// exit application button. 
+    /// </summary>
     public class TitleBarPanel : MonoBehaviour
     {
-        public string title;
-
-        void Start()
+        /// <summary>
+        /// Method <c>OnApplicationQuit</c> is executed when the user clicks
+        /// the exit button.
+        /// </summary>
+        public void OnApplicationQuit()
         {
-            Text text = ComponentUtil.FindComponent<Text>("Title", this);
-            Button button = ComponentUtil.FindComponent<Button>("ExitButton", this);
-
-            if (text)
-            {
-                text.text = title;
-            }
-            if (button)
-            {
-                button.onClick.AddListener(() => Application.Quit());
-            }
+            Application.Quit();
         }
     }
 }
