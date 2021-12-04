@@ -129,7 +129,7 @@ namespace GameHub.Games.TicTacToe2D.UI
             PlayerSettings settings = PlayerSettingsManager.Instance.GetSettings();
 
             IPlayer player1 = new HumanPlayer(
-                UserInfoManager.GetUserInfo(),
+                UserInfoManager.Instance.GetUserInfo(),
                 PlayerSettingsManager.Instance.GetSettings()
             );
 
@@ -146,7 +146,7 @@ namespace GameHub.Games.TicTacToe2D.UI
             else
             {
                 player2 = new HumanPlayer(
-                    UserInfoManager.GetUserInfo(),
+                    UserInfoManager.Instance.GetUserInfo(),
                     PlayerSettings.Omega
                 );
             }
