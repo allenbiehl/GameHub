@@ -1,5 +1,5 @@
 using UnityEngine;
-s
+
 namespace GameHub.Core.UI
 {
     /// <summary>
