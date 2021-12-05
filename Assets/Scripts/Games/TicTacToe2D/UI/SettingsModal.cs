@@ -7,16 +7,16 @@ using UnityEngine.UI;
 namespace GameHub.Games.TicTacToe2D.UI
 {
     /// <summary>
-    /// class <c>NewSeriesModal</c> represents the modal for starting a new Tic Tac Toe
-    /// game series with an opponent. 
+    /// class <c>SettingsModal</c> represents the player settings modal which is used 
+    /// to modify various game settings including win length and board size.
     /// </summary>
-    public class PlayAgainModal : MonoBehaviour
+    public class SettingsModal : MonoBehaviour
     {
         /// <summary>
-        /// Instance variable <c>_instance</c> for storing the <c>PlayAgainModal</c>
+        /// Instance variable <c>_instance</c> for storing the <c>SettingsModal</c>
         /// singleton instance.
         /// </summary>
-        private static PlayAgainModal _instance;
+        private static SettingsModal _instance;
 
         /// <summary>
         /// Instance variable <c>_winLengthDropdown</c> is used to store the total number of
@@ -33,28 +33,28 @@ namespace GameHub.Games.TicTacToe2D.UI
         private Dropdown _boardSizeDropdown;
 
         /// <summary>
-        /// Instance variable <c>_yesButton</c> is used to store the yes button.
+        /// Instance variable <c>_saveButton</c> is used to store the save button.
         /// </summary>
         [SerializeField]
-        private Button _yesButton;
+        private Button _saveButton;
 
         /// <summary>
-        /// Instance variable <c>_noButton</c> is used to store the no button.
+        /// Instance variable <c>_cancelButton</c> is used to store the cancel button.
         /// </summary>
         [SerializeField]
-        private Button _noButton;
+        private Button _cancelButton;
 
         /// <summary>
-        /// Property <c>Instance</c> returns the <c>PlayAgainModal</c> singleton 
+        /// Property <c>Instance</c> returns the <c>SettingsModal</c> singleton 
         /// instance.
         /// </summary>
-        public static PlayAgainModal Instance
+        public static SettingsModal Instance
         {
             get
             {
                 if (!_instance)
                 {
-                    _instance = FindObjectOfType(typeof(PlayAgainModal)) as PlayAgainModal;
+                    _instance = FindObjectOfType(typeof(SettingsModal)) as SettingsModal;
                 }
                 return _instance;
             }
@@ -115,28 +115,23 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// <c>onYes</c> represents the callback that will be called when the 
         /// user clicks the Yes button. 
         /// </param>
-        /// <param name="onYes">
-        /// <c>onNo</c> represents the callback that will be called when the 
-        /// user clicks the No button. 
-        /// </param>
-        public void Open(UnityAction onYes, UnityAction onNo)
+        public void Open(UnityAction onSave)
         {
             SetActive(true);
 
-            if (_yesButton)
+            if (_saveButton)
             {
-                _yesButton.onClick.RemoveAllListeners();
-                _yesButton.onClick.AddListener(() => {
-                    SaveSettings(onYes);
+                _saveButton.onClick.RemoveAllListeners();
+                _saveButton.onClick.AddListener(() => {
+                    SaveSettings(onSave);
                 });
-                _yesButton.onClick.AddListener(Close);
+                _saveButton.onClick.AddListener(Close);
             }
 
-            if (_noButton)
+            if (_cancelButton)
             {
-                _noButton.onClick.RemoveAllListeners();
-                _noButton.onClick.AddListener(Close);
-                _noButton.onClick.AddListener(onNo);
+                _cancelButton.onClick.RemoveAllListeners();
+                _cancelButton.onClick.AddListener(Close);
             }
 
             PlayerSettings playerSettings = PlayerSettingsManager.Instance.GetSettings();
@@ -144,20 +139,19 @@ namespace GameHub.Games.TicTacToe2D.UI
             if (_winLengthDropdown)
             {
                 _winLengthDropdown.value = _winLengthDropdown.options
-                    .FindIndex(option => option.text == playerSettings.LengthToWin.ToString());
+                .FindIndex(option => option.text == playerSettings.LengthToWin.ToString());
             }
-
             if (_boardSizeDropdown)
             {
                 _boardSizeDropdown.value = _boardSizeDropdown.options
-                    .FindIndex(option => option.text == playerSettings.BoardSize.ToString());
+                .FindIndex(option => option.text == playerSettings.BoardSize.ToString());
             }
         }
 
         /// <summary>
         /// Method <c>Close</c> is used to close / hide the modal from the user.
         /// </summary>
-        void Close()
+        private void Close()
         {
             SetActive(false);
         }
@@ -169,7 +163,7 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// <c>active</c> represent whether the modal should be visible (true)
         /// or hidden (false).
         /// </param>
-        void SetActive(bool active)
+        private void SetActive(bool active)
         {
             _instance.gameObject.SetActive(active);
         }
@@ -182,7 +176,7 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// <param name="onSave">
         /// <c>onSave</c> callback that is invoked after settings are successfully saved.
         /// </param>
-        void SaveSettings(UnityAction onSave)
+        private void SaveSettings(UnityAction onSave)
         {
             PlayerSettings settings = PlayerSettingsManager.Instance.GetSettings();
 

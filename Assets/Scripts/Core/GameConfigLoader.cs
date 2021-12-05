@@ -48,7 +48,7 @@ namespace GameHub.Core
             Sprite sprite;
             List<GameConfig> gameConfigs = new List<GameConfig>();
 
-            sprite = SpriteLoader.Load("grid");
+            sprite = SpriteLoader.Instance.Load("grid");
             gameConfigs.Add(new GameConfig("Tic Tac Toe 2D", "TicTacToe2D", sprite));
 
             //sprite = SpriteLoader.Load("rubik");
