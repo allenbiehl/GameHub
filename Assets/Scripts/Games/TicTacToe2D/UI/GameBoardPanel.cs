@@ -1,10 +1,9 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 using GameHub.Core;
-using GameHub.Core.Util;
 using GameHub.Games.TicTacToe2D.Event;
+using Zenject;
 
 namespace GameHub.Games.TicTacToe2D.UI
 {
@@ -14,6 +13,17 @@ namespace GameHub.Games.TicTacToe2D.UI
     /// </summary>
     public class GameBoardPanel : MonoBehaviour
     {
+        /// <summary>
+        /// Instance variable <c>_playerSettingsService</c> is used to retrieve and persist 
+        /// player game settings across game sessions.
+        /// </summary>
+        private IPlayerSettingsService _playerSettingsService;
+
+        /// <summary>
+        /// Instance variable <c>_sceneLoader</c> is used to load scenes.
+        /// </summary>
+        private ISceneLoader _sceneLoader;
+
         /// <summary>
         /// Instance variable <c>_boardClickEnabled</c> is a flag that determines when 
         /// board clicks are permitted or blocked. This can be used to block the player
@@ -29,6 +39,13 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// game.
         /// </summary>
         private int _boardId;
+
+        /// <summary>
+        /// Instance variable <c>_newSeriesModal</c> represents the modal used to
+        /// start a new game series.
+        /// </summary>
+        [SerializeField]
+        private PlayAgainModal _playAgainModal;
 
         /// <summary>
         /// Instance variable <c>_gameObjectMaterial</c> is the material associated with
@@ -59,6 +76,22 @@ namespace GameHub.Games.TicTacToe2D.UI
         private Sprite _crossSprite;
 
         /// <summary>
+        /// Method <c>Setup</c> is responsible for wiring up depedencies on object creation.
+        /// </summary>
+        /// <param name="playerSettingsService">
+        /// <c>playerSettingsService</c> is used to retrieve and persist player game settings.
+        /// </param>
+        /// <param name="playerSettingsService">
+        /// <c>playerSettingsService</c> is used to load scenes.
+        /// </param>
+        [Inject]
+        public void Setup(IPlayerSettingsService playerSettingsService, ISceneLoader sceneLoader)
+        {
+            _playerSettingsService = playerSettingsService;
+            _sceneLoader = sceneLoader;
+        }
+
+        /// <summary>
         /// Method <c>Start</c> is used to initialize the component.
         /// </summary>
         private void Start()
@@ -68,9 +101,6 @@ namespace GameHub.Games.TicTacToe2D.UI
             GameManager.Instance.EventBus.TieGameEvents.AddListener(OnTieGame);
             GameManager.Instance.EventBus.PlayerClaimEvents.AddListener(OnPlayerClaim);
             GameManager.Instance.EventBus.PlayerWinEvents.AddListener(OnPlayerWin);
-
-            _circleSprite = SpriteLoader.Instance.Load("cell-circle");
-            _crossSprite = SpriteLoader.Instance.Load("cell-cross");
         }
 
         /// <summary>
@@ -206,7 +236,7 @@ namespace GameHub.Games.TicTacToe2D.UI
         private void NewGame()
         {
             GameManager manager = GameManager.Instance;
-            PlayerSettings settings = PlayerSettingsManager.Instance.GetSettings();
+            PlayerSettings settings = _playerSettingsService.GetSettings();
 
             GameBoard gameBoard = new GameBoard(settings.BoardSize);
             GameState gameState = manager.InitializeGame(gameBoard, settings.LengthToWin);
@@ -351,7 +381,7 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </summary>
         private void CheckPlayAgain()
         {
-            PlayAgainModal.Instance.Open(NewGame, BackToMain);
+            _playAgainModal.Open(NewGame, BackToMain);
         }
 
         /// <summary>
@@ -360,7 +390,7 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </summary>
         private void BackToMain()
         {
-            SceneLoader.Instance.LoadMainMenu();
+            _sceneLoader.LoadMainMenu();
         }
     }
 }

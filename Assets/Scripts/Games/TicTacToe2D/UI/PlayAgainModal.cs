@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using GameHub.Core.Security;
+using Zenject;
 
 namespace GameHub.Games.TicTacToe2D.UI
 {
@@ -13,10 +15,16 @@ namespace GameHub.Games.TicTacToe2D.UI
     public class PlayAgainModal : MonoBehaviour
     {
         /// <summary>
-        /// Instance variable <c>_instance</c> for storing the <c>PlayAgainModal</c>
-        /// singleton instance.
+        /// Instance variable <c>_userInfoService</c> is responsible for managing
+        /// the current user's <c>UserInfo</c>.
         /// </summary>
-        private static PlayAgainModal _instance;
+        private IUserInfoService _userInfoService;
+
+        /// <summary>
+        /// Instance variable <c>_playerSettingsService</c> is used to retrieve and persist 
+        /// player game settings across game sessions.
+        /// </summary>
+        private IPlayerSettingsService _playerSettingsService;
 
         /// <summary>
         /// Instance variable <c>_winLengthDropdown</c> is used to store the total number of
@@ -45,19 +53,19 @@ namespace GameHub.Games.TicTacToe2D.UI
         private Button _noButton;
 
         /// <summary>
-        /// Property <c>Instance</c> returns the <c>PlayAgainModal</c> singleton 
-        /// instance.
+        /// Method <c>Setup</c> is responsible for wiring up depedencies on object creation.
         /// </summary>
-        public static PlayAgainModal Instance
+        /// <param name="userInfoService">
+        /// <c>userInfoService</c> is reponsible for managing the current user's <c>UserInfo</c>
+        /// </param>
+        /// <param name="playerSettingsService">
+        /// <c>playerSettingsService</c> is used to retrieve and persist player game settings.
+        /// </param>
+        [Inject]
+        public void Setup(IUserInfoService userInfoService, IPlayerSettingsService playerSettingsService)
         {
-            get
-            {
-                if (!_instance)
-                {
-                    _instance = FindObjectOfType(typeof(PlayAgainModal)) as PlayAgainModal;
-                }
-                return _instance;
-            }
+            _userInfoService = userInfoService;
+            _playerSettingsService = playerSettingsService;
         }
 
         /// <summary>
@@ -65,7 +73,7 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </summary>
         private void Start()
         {
-            Instance.Close();
+            Close();
 
             if (_winLengthDropdown)
             {
@@ -139,7 +147,7 @@ namespace GameHub.Games.TicTacToe2D.UI
                 _noButton.onClick.AddListener(onNo);
             }
 
-            PlayerSettings playerSettings = PlayerSettingsManager.Instance.GetSettings();
+            PlayerSettings playerSettings = _playerSettingsService.GetSettings();
 
             if (_winLengthDropdown)
             {
@@ -171,7 +179,7 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </param>
         void SetActive(bool active)
         {
-            _instance.gameObject.SetActive(active);
+            gameObject.SetActive(active);
         }
 
         /// <summary>
@@ -184,7 +192,7 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </param>
         void SaveSettings(UnityAction onSave)
         {
-            PlayerSettings settings = PlayerSettingsManager.Instance.GetSettings();
+            PlayerSettings settings = _playerSettingsService.GetSettings();
 
             if (_winLengthDropdown)
             {
@@ -194,7 +202,7 @@ namespace GameHub.Games.TicTacToe2D.UI
             {
                 settings.BoardSize = Int32.Parse(_boardSizeDropdown.options[_boardSizeDropdown.value].text);
             }
-            PlayerSettingsManager.Instance.SaveSettings(settings);
+            _playerSettingsService.SaveSettings(settings);
 
             onSave.Invoke();
         }

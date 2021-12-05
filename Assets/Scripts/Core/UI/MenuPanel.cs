@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using GameHub.Core.Security;
 using TMPro;
+using Zenject;
 
 namespace GameHub.Core.UI
 {
@@ -11,6 +12,19 @@ namespace GameHub.Core.UI
     public class MenuPanel : MonoBehaviour
     {
         /// <summary>
+        /// Instance variable <c>_userInfoService</c> is responsible for managing
+        /// the current user's <c>UserInfo</c>.
+        /// </summary>
+        private IUserInfoService _userInfoService;
+
+        /// <summary>
+        /// Instance variable <c>_userSettingsModal</c> represents the modal used to
+        /// edit user settings.
+        /// </summary>
+        [SerializeField]
+        private UserSettingsModal _userSettingsModal;
+
+        /// <summary>
         /// Instance variable <c>_avatarText</c> is associated with the avatar label 
         /// which displays the current users initials. We maintain a reference to this
         /// object in the event that the user changes then name / initials.
@@ -19,11 +33,23 @@ namespace GameHub.Core.UI
         private TMP_Text _avatarText;
 
         /// <summary>
+        /// Method <c>Setup</c> is responsible for wiring up depedencies on object creation.
+        /// </summary>
+        /// <param name="userInfoService">
+        /// <c>userInfoService</c> is reponsible for managing the current user's <c>UserInfo</c>
+        /// </param>
+        [Inject]
+        public void Setup(IUserInfoService userInfoService)
+        {
+            _userInfoService = userInfoService;
+        }
+
+        /// <summary>
         /// Method <c>Start</c> handles component initialization routines. 
         /// </summary>
         void Start()
         {
-            UserInfo userInfo = UserInfoManager.Instance.GetUserInfo();
+            UserInfo userInfo = _userInfoService.GetUserInfo();
             SetAvatarText(userInfo);
         }
 
@@ -33,7 +59,7 @@ namespace GameHub.Core.UI
         /// </summary>
         public void OnEditSettings()
         {
-            UserSettingsModal.Instance.Open(new UnityAction(OnSave), new UnityAction(OnCancel));
+            _userSettingsModal.Open(new UnityAction(OnSave), new UnityAction(OnCancel));
         }
 
         /// <summary>
@@ -43,7 +69,7 @@ namespace GameHub.Core.UI
         /// </summary>
         private void OnSave()
         {
-            UserInfo userInfo = UserInfoManager.Instance.GetUserInfo();
+            UserInfo userInfo = _userInfoService.GetUserInfo();
             SetAvatarText(userInfo);
         }
 
