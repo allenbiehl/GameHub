@@ -2,21 +2,65 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using GameHub.Core;
 using GameHub.Core.Util;
 using GameHub.Games.TicTacToe2D.Event;
 
 namespace GameHub.Games.TicTacToe2D.UI
 {
+    /// <summary>
+    /// Class <c>GameBoardPanel</c> represents the panel where the game board grid
+    /// is rendered to.
+    /// </summary>
     public class GameBoardPanel : MonoBehaviour
     {
-        public Material gameObjectMaterial;
-        private Sprite _circleSprite;
-        private Sprite _crossSprite;
+        /// <summary>
+        /// Instance variable <c>_boardClickEnabled</c> is a flag that determines when 
+        /// board clicks are permitted or blocked. This can be used to block the player
+        /// from clicking on the board when its not their turn or to block clicking at
+        /// the end of a game.
+        /// </summary>
         private bool _boardClickEnabled;
-        public AudioSource audioSource;
 
+        /// <summary>
+        /// Instance variable <c>_boardId</c> is the most recent board iteration. Each
+        /// time a board is generated we increment the board id. This ensures that a user
+        /// cannot click on any game objects that are still in memory from the previous
+        /// game.
+        /// </summary>
         private int _boardId;
 
+        /// <summary>
+        /// Instance variable <c>_gameObjectMaterial</c> is the material associated with
+        /// the player icons which represent x's and o's.
+        /// </summary>
+        [SerializeField]
+        public Material _gameObjectMaterial;
+
+        /// <summary>
+        /// Instance variable <c>_audioWinSourc</c> is an audio resource that we play when
+        /// a user wins a game. 
+        /// </summary>
+        [SerializeField]
+        private AudioSource _audioWinSource;
+
+        /// <summary>
+        /// Instance variable <c>_circleSprite</c> is the circle token for the defensive
+        /// player.
+        /// </summary>
+        [SerializeField]
+        private Sprite _circleSprite;
+
+        /// <summary>
+        /// Instance variable <c>_crossSprite</c> is the cross token for the offsenvie
+        /// player.
+        /// </summary>
+        [SerializeField]
+        private Sprite _crossSprite;
+
+        /// <summary>
+        /// Method <c>Start</c> is used to initialize the component.
+        /// </summary>
         private void Start()
         {
             GameManager.Instance.EventBus.NewSeriesEvents.AddListener(OnNewGame);
@@ -25,24 +69,53 @@ namespace GameHub.Games.TicTacToe2D.UI
             GameManager.Instance.EventBus.PlayerClaimEvents.AddListener(OnPlayerClaim);
             GameManager.Instance.EventBus.PlayerWinEvents.AddListener(OnPlayerWin);
 
-            _circleSprite = SpriteLoader.Load("cell-circle");
-            _crossSprite = SpriteLoader.Load("cell-cross");
+            _circleSprite = SpriteLoader.Instance.Load("cell-circle");
+            _crossSprite = SpriteLoader.Instance.Load("cell-cross");
         }
 
+        /// <summary>
+        /// Method <c>OnTieGame</c> is a listener that is executed when the game manager
+        /// determines that a tie game occurred.
+        /// </summary>
+        /// <param name="eventType">
+        /// <c>eventType</c> is a generic event type with no information.
+        /// </param>
         private void OnTieGame(GameEvent eventType)
         {
             CheckPlayAgain();
         }
 
+        /// <summary>
+        /// Method <c>OnPlayerWin</c> is a listener that is executed when the game manager
+        /// determines that one of the players won the game. When this event occurs, the
+        /// win audio source is played and the winning claim path is highlighted.
+        /// </summary>
+        /// <param name="eventType">
+        /// <c>eventType</c> is an event associated with the winning player.
+        /// </param>
         private void OnPlayerWin( PlayerWinEvent eventType )
         {
-            if (audioSource)
+            if (_audioWinSource)
             {
-                audioSource.Play();
+                _audioWinSource.Play();
             }
             StartCoroutine(HighlightWinCells(eventType, 6, .35f));
         }
 
+        /// <summary>
+        /// Method <c>HighlightWinCells</c> is used to create a pulsing effect on the 
+        /// winning game pieces / cells.
+        /// </summary>
+        /// <param name="eventType">
+        /// <c>eventType</c> is an event associated with the winning player.
+        /// </param>
+        /// <param name="count">
+        /// <c>count</c> is the total number of times to pulse the winning game pieces.
+        /// </param>
+        /// <param name="delay">
+        /// <c>delay</c> is the number of seconds to delay before repeating the pulse.
+        /// </param>
+        /// <returns></returns>
         private IEnumerator HighlightWinCells( PlayerWinEvent eventType, int count, float delay )
         {
             _boardClickEnabled = false;
@@ -85,6 +158,14 @@ namespace GameHub.Games.TicTacToe2D.UI
             CheckPlayAgain();
         }
 
+        /// <summary>
+        /// Method <c>OnPlayerClaim</c> is a listener that is executed when the game manager
+        /// determines that the user claimed an available game board position. We always check
+        /// with the game manager before claiming a position on the board.
+        /// </summary>
+        /// <param name="eventType">
+        /// <c>eventType</c> is an event associated with the completed player move.
+        /// </param>
         public void OnPlayerClaim( PlayerClaimEvent eventType )
         {
             PlayerMove playerMove = eventType.PlayerMove;
@@ -106,11 +187,22 @@ namespace GameHub.Games.TicTacToe2D.UI
             }
         }
 
+        /// <summary>
+        /// Method <c>OnNewGame</c> is a listener that is executed when the current game is over
+        /// and the player 1 chooses to player another game via the Play New Game modal.
+        /// </summary>
+        /// <param name="eventType">
+        /// <c>eventType</c> is a generic event with no additional information.
+        /// </param>
         private void OnNewGame( GameEvent eventType )
         {
             NewGame();
         }
 
+        /// <summary>
+        /// Method <c>NewGame</c> is used to initialize and start a new game. First, the game manager
+        /// initializes a new game, then we build a new game board, and then we start the game.
+        /// </summary>
         private void NewGame()
         {
             GameManager manager = GameManager.Instance;
@@ -126,6 +218,13 @@ namespace GameHub.Games.TicTacToe2D.UI
             _boardClickEnabled = true;
         }
 
+        /// <summary>
+        /// Method <c>BuildGameboard</c> is used to discard the current game board and pieces and 
+        /// create a new game board.
+        /// </summary>
+        /// <param name="game">
+        /// <c>game</c> is the new initialized game state.
+        /// </param>
         private void BuildGameBoard( GameState game )
         {
             DestroyExistingGameBoard();
@@ -183,7 +282,7 @@ namespace GameHub.Games.TicTacToe2D.UI
 
                     Image iconImage = icon.AddComponent<Image>();
                     iconImage.color = Color.clear;
-                    iconImage.material = gameObjectMaterial;
+                    iconImage.material = _gameObjectMaterial;
                     iconImage.transform.localScale = new Vector2(.8f, .8f);
 
                     Vector2 rowCoordinates = new Vector2(row, col);
@@ -213,6 +312,10 @@ namespace GameHub.Games.TicTacToe2D.UI
             boardRect.sizeDelta = new Vector2(gridWidth, gridHeight);
         }
 
+        /// <summary>
+        /// Method <c>DestroyExistingGameBoard</c> is used to destroy the current game
+        /// board before building a new one.
+        /// </summary>
         private void DestroyExistingGameBoard()
         {
             Transform boardTransform = transform.Find($"GameBoard{_boardId}");
@@ -223,6 +326,13 @@ namespace GameHub.Games.TicTacToe2D.UI
             }
         }
 
+        /// <summary>
+        /// Method <c>GetGutterSize</c> is used to dynamically determine the gutter 
+        /// size based on the game board dimensions. The larger the game board, the 
+        /// smaller the gutter size.
+        /// </summary>
+        /// <param name="boardSize"></param>
+        /// <returns></returns>
         private int GetGutterSize( int boardSize )
         {
             if (boardSize <= 3)
@@ -232,9 +342,25 @@ namespace GameHub.Games.TicTacToe2D.UI
             return 1;
         }
 
+        /// <summary>
+        /// Method <c>CheckPlayerAgain</c> is called after a game completes and we
+        /// need to check with player 1 if they wish to continue the series and play
+        /// a new game with the current opponent. If player 1 wishes to start a new
+        /// game against another opponent, then they need to click the Start Series
+        /// button which allows the user to choose a different opponent.
+        /// </summary>
         private void CheckPlayAgain()
         {
-            PlayAgainModal.Instance.Open(new UnityAction(NewGame));
+            PlayAgainModal.Instance.Open(NewGame, BackToMain);
+        }
+
+        /// <summary>
+        /// Method <c>BackToMain</c> is called when the user chooses not to play again
+        /// and the system redirects the user back to the main menu.
+        /// </summary>
+        private void BackToMain()
+        {
+            SceneLoader.Instance.LoadMainMenu();
         }
     }
 }

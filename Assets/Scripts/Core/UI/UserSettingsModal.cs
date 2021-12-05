@@ -39,7 +39,8 @@ namespace GameHub.Core.UI
         /// <summary>
         /// Instance variable <c>_fields</c> for storing references to all UI fields.
         /// </summary>
-        [SerializeField] private Fields _fields = new Fields();
+        [SerializeField] 
+        private Fields _fields = new Fields();
 
         /// <summary>
         /// Class <c>Fields</c> is used to group all  related UI action components.
@@ -54,7 +55,8 @@ namespace GameHub.Core.UI
         /// <summary>
         /// Instance variable <c>_fields</c> for storing references to all UI buttons.
         /// </summary>
-        [SerializeField] private Buttons _buttons = new Buttons();
+        [SerializeField] 
+        private Buttons _buttons = new Buttons();
 
         /// <summary>
         /// Property <c>Instance</c> returns the <c>UserSettingsModal</c> singleton 
@@ -95,26 +97,42 @@ namespace GameHub.Core.UI
         {
             SetActive(true);
 
-            _buttons.SaveButton.onClick.RemoveAllListeners();
-            _buttons.SaveButton.onClick.AddListener(() => {
-                SaveSettings(onSave);
-            });
-            _buttons.SaveButton.onClick.AddListener(Close);
+            if (_buttons.SaveButton)
+            {
+                _buttons.SaveButton.onClick.RemoveAllListeners();
+                _buttons.SaveButton.onClick.AddListener(() => {
+                    SaveSettings(onSave);
+                });
+                _buttons.SaveButton.onClick.AddListener(Close);
+            }
 
-            _buttons.CancelButton.onClick.RemoveAllListeners();
-            _buttons.CancelButton.onClick.AddListener(onCancel);
-            _buttons.CancelButton.onClick.AddListener(Close);
+            if (_buttons.CancelButton)
+            {
+                _buttons.CancelButton.onClick.RemoveAllListeners();
+                _buttons.CancelButton.onClick.AddListener(onCancel);
+                _buttons.CancelButton.onClick.AddListener(Close);
+            }
 
             UserInfo userInfo = UserInfoManager.Instance.GetUserInfo();
-            _fields.UsernameField.text = userInfo.Username;
-            _fields.LastNameField.text = userInfo.LastName;
-            _fields.FirstNameField.text = userInfo.FirstName;
+
+            if (_fields.UsernameField)
+            {
+                _fields.UsernameField.text = userInfo.Username;
+            }
+            if (_fields.LastNameField)
+            {
+                _fields.LastNameField.text = userInfo.LastName;
+            }
+            if (_fields.FirstNameField)
+            {
+                _fields.FirstNameField.text = userInfo.FirstName;
+            }
         }
 
         /// <summary>
         /// Method <c>Close</c> is used to close / hide the modal from the user.
         /// </summary>
-        void Close()
+        private void Close()
         {
             SetActive(false);
         }
@@ -126,7 +144,7 @@ namespace GameHub.Core.UI
         /// <c>active</c> represent whether the modal should be visible (true)
         /// or hidden (false).
         /// </param>
-        void SetActive(bool active)
+        private void SetActive(bool active)
         {
             _instance.gameObject.SetActive(active);
         }
@@ -136,13 +154,25 @@ namespace GameHub.Core.UI
         /// <c>UserInfoManager</c> and then execute the associated <c>onSave</c>
         /// callback.
         /// </summary>
-        /// <param name="onSave"></param>
-        void SaveSettings(UnityAction onSave)
+        /// <param name="onSave">
+        /// <c>onSave</c> callback that is invoked after settings are successfully saved.
+        /// </param>
+        private void SaveSettings(UnityAction onSave)
         {
             UserInfo userInfo = UserInfoManager.Instance.GetUserInfo();
-            userInfo.Username = _fields.UsernameField.text;  
-            userInfo.LastName = _fields.LastNameField.text;  
-            userInfo.FirstName = _fields.FirstNameField.text;    
+
+            if (_fields.UsernameField)
+            {
+                userInfo.Username = _fields.UsernameField.text;
+            }
+            if (_fields.LastNameField)
+            {
+                userInfo.LastName = _fields.LastNameField.text;
+            }
+            if (_fields.FirstNameField)
+            {
+                userInfo.FirstName = _fields.FirstNameField.text;
+            }
             UserInfoManager.Instance.SaveUserInfo(userInfo);
 
             onSave.Invoke();

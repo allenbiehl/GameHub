@@ -12,21 +12,38 @@ namespace GameHub.Core.UI
     public class HoverImage : Image, IPointerEnterHandler, IPointerExitHandler
     {
         /// <summary>
-        /// Property <c>cursorTexture</c> stores the cursor texture to display 
-        /// when the mouse pointer enteres the target area.
-        /// </summary>
-        public Texture2D cursorTexture;
-
-        /// <summary>
         /// Instance variable <c>_originalColor</c> stores the original
         /// image background color.
         /// </summary>
         private Color? _originalColor;
 
         /// <summary>
-        /// Property <c>hoverColor</c> stores the hover image background color.
+        /// Instance variable <c>cursorTexture</c> stores the cursor texture to display 
+        /// when the mouse pointer enteres the target area.
         /// </summary>
-        public Color hoverColor;
+        [SerializeField]
+        private Texture2D _cursorTexture;
+
+        [SerializeField]
+        /// <summary>
+        /// Instance variable <c>hoverColor</c> stores the hover image background color.
+        /// </summary>
+        private Color _hoverColor;
+
+        /// <summary>
+        /// Property <c>HoverColor</c> provides a method method for getting / setting the 
+        /// internal hover color.
+        /// </summary>
+        public Color HoverColor { 
+            get
+            {
+                return _hoverColor;
+            }
+            set
+            {
+                _hoverColor = value;
+            }
+        }
 
         /// <summary>
         /// Method <c>OnPointerEnter</c> is called when the mouse pointer
@@ -41,11 +58,11 @@ namespace GameHub.Core.UI
             if (_originalColor == null)
             {
                 _originalColor = color;
-                color = hoverColor;
+                color = _hoverColor;
 
-                if (cursorTexture)
+                if (_cursorTexture)
                 {
-                    Cursor.SetCursor(cursorTexture, Vector2.zero, CursorMode.Auto);
+                    Cursor.SetCursor(_cursorTexture, Vector2.zero, CursorMode.Auto);
                 }
             }
         }
@@ -65,7 +82,7 @@ namespace GameHub.Core.UI
                 color = (Color) _originalColor;
                 _originalColor = null;
 
-                if (cursorTexture)
+                if (_cursorTexture)
                 {
                     Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
                 }

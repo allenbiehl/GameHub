@@ -1,20 +1,20 @@
 using UnityEngine;
-using UnityEngine.UI;
 using GameHub.Core;
-using GameHub.Core.Util;
 
 namespace GameHub.Games.TicTacToe2D.UI
 {
+    /// <summary>
+    /// Class <c>HomeButton</c> is used by the user to navigate back to the Main Menu.
+    /// </summary>
     public class HomeButton : MonoBehaviour
     {
-        void Start()
+        /// <summary>
+        /// Method <c>OnLoadMainMenu</c> is executed when the user clicks the home
+        /// button at which point the <c>SceneLoader</c> displays the Main Menu scene.
+        /// </summary>
+        public void OnLoadMainMenu()
         {
-            Button button = ComponentUtil.GetComponent<Button>(this);
-
-            if (button)
-            {
-                button.onClick.AddListener(() => SceneLoader.Instance.LoadMainMenu());
-            }
+            SceneLoader.Instance.LoadMainMenu();
         }
     }
 }

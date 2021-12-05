@@ -15,7 +15,8 @@ namespace GameHub.Core.UI
         /// which displays the current users initials. We maintain a reference to this
         /// object in the event that the user changes then name / initials.
         /// </summary>
-        [SerializeField] private TMP_Text _avatarText;
+        [SerializeField] 
+        private TMP_Text _avatarText;
 
         /// <summary>
         /// Method <c>Start</c> handles component initialization routines. 

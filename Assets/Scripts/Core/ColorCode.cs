@@ -1,9 +1,10 @@
-using System;
-using System.Globalization;
 using UnityEngine;
 
 namespace GameHub.Core
 { 
+    /// <summary>
+    /// Struct <c>ColorCode</c> provides standard color codes.
+    /// </summary>
    public struct ColorCode
     {
         public static Color Blue => new Color(0.1971978f, 0.4572087f, 0.8867924f, 255);

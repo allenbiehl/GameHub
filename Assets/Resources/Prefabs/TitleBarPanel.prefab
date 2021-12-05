@@ -466,5 +466,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb6bdd66475b4684a81e7610fc9c8108, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hoverButtonColor: {r: 0.9056604, g: 0.2355693, b: 0.2355693, a: 1}
-  hoverTextColor: {r: 1, g: 1, b: 1, a: 1}
+  _hoverButtonColor: {r: 0.9056604, g: 0.2355693, b: 0.2355693, a: 1}
+  _hoverIconColor: {r: 1, g: 1, b: 1, a: 1}
+  _icon: {fileID: 2556682031141495028}

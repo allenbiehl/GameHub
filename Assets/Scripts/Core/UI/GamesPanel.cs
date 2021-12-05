@@ -120,7 +120,7 @@ namespace GameHub.Core.UI
 
                     HoverImage image = gameListRow.AddComponent<HoverImage>();
                     image.color = Color.clear;
-                    image.hoverColor = new Color(.2f, .2f, .2f, 1);
+                    image.HoverColor = new Color(.2f, .2f, .2f, 1);
 
                     Button menuBtn = gameListRow.AddComponent<Button>();
                     menuBtn.onClick.AddListener(() => SceneLoader.Instance.Load(config.Scene, true));

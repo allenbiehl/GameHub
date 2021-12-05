@@ -1,25 +1,18 @@
 using UnityEngine;
-using UnityEngine.UI;
-using GameHub.Core.Util;
-using GameHub.Core.Security;
-using GameHub.Games.TicTacToe2D.Event;
-using GameHub.Games.TicTacToe2D.AI;
 
 namespace GameHub.Games.TicTacToe2D.UI
 {
+    /// <summary>
+    /// Class <c>NewSeriesButton</c> is used by the user to start a new game series.
+    /// </summary>
     public class NewSeriesButton : MonoBehaviour
     {
-        void Start()
-        {
-            Button button = ComponentUtil.GetComponent<Button>(this);
-
-            if (button)
-            {
-                button.onClick.AddListener(NewSeries);
-            }
-        }
-
-        private void NewSeries()
+        /// <summary>
+        /// Method <c>OnLoadNewSeriesModal</c> is executed when the user clicks the 
+        /// New Series button at which point the system opens the <c>NewSeriesModal</c>
+        /// instance.
+        /// </summary>
+        public void OnLoadNewSeriesModal()
         {
             NewSeriesModal.Instance.Open();
         }

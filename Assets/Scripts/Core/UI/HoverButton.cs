@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;  
 using UnityEngine.UI;
-using GameHub.Core.Util;
 
 namespace GameHub.Core.UI
 { 
@@ -32,18 +31,42 @@ namespace GameHub.Core.UI
         private Color? _originalTextColor;
 
         /// <summary>
-        /// Property <c>hoverButtonColor</c> is used to store the hover button
-        /// color that will be displayed when the mouse pointer enters the 
-        /// target area.
+        /// Instance variable <c>hoverButtonColor</c> is used to store the 
+        /// hover button color that will be displayed when the mouse pointer 
+        /// enters the target area.
         /// </summary>
-        public Color hoverButtonColor = new Color(0.9056604f, 0.2355693f, 0.2355693f, 1);
+        [SerializeField]
+        private Color _hoverButtonColor = new Color(0.9056604f, 0.2355693f, 0.2355693f, 1);
 
         /// <summary>
-        /// Property <c>hoverIconColor</c> is used to store the hover icon
-        /// color that will be displayed when the mouse pointer enters the 
-        /// target area.
+        /// Instance variables <c>hoverIconColor</c> is used to store the 
+        /// hover icon color that will be displayed when the mouse pointer 
+        /// enters the target area.
         /// </summary>
-        public Color hoverTextColor = new Color(1, 1, 1, 1);
+        [SerializeField]
+        private Color _hoverIconColor = new Color(1, 1, 1, 1);
+
+        /// <summary>
+        /// Instance variables <c>hoverTextColor</c> is used to store the 
+        /// hover text color that will be displayed when the mouse pointer 
+        /// enters the target area.
+        /// </summary>
+        [SerializeField]
+        private Color _hoverTextColor = new Color(1, 1, 1, 1);
+
+        /// <summary>
+        /// Instance variable <c>_icon</c> is used to store the icon image
+        /// reference that sits on top of the button.
+        /// </summary>
+        [SerializeField]
+        private Image _icon;
+
+        /// <summary>
+        /// Instance variable <c>_text</c> is used to store the text
+        /// reference that sits on top of the button.
+        /// </summary>
+        [SerializeField]
+        private Text _text;
 
         /// <summary>
         /// Method <c>OnPointerEnter</c> is called when the mouse pointer
@@ -57,25 +80,22 @@ namespace GameHub.Core.UI
         {
             if (_originalButtonColor == null)
             {
-                Image button = ComponentUtil.GetComponent<Image>(this);
+                Image button = transform.GetComponent<Image>();
                 
                 if (button)
                 { 
                     _originalButtonColor = button.color;
-                    button.color = hoverButtonColor;
+                    button.color = _hoverButtonColor;
 
-                    Image icon = ComponentUtil.FindComponent<Image>("Icon", this);
-                    Text text = ComponentUtil.FindComponent<Text>("Text", this);
-
-                    if (icon)
+                    if (_icon)
                     {
-                        _originalIconColor = icon.color;
-                        icon.color = hoverTextColor;
+                        _originalIconColor = _icon.color;
+                        _icon.color = _hoverIconColor;
                     }
-                    if (text)
+                    if (_text)
                     {
-                        _originalTextColor = text.color;
-                        text.color = hoverTextColor;
+                        _originalTextColor = _text.color;
+                        _text.color = _hoverTextColor;
                     }
                 }
             }
@@ -90,24 +110,21 @@ namespace GameHub.Core.UI
         {
             if (_originalButtonColor != null)
             {
-                Image button = ComponentUtil.GetComponent<Image>(this);
+                Image button = transform.GetComponent<Image>();
 
                 if (button)
                 {
                     button.color = (Color) _originalButtonColor;
                     _originalButtonColor = null;
 
-                    Image icon = ComponentUtil.FindComponent<Image>("Icon", this);
-                    Text text = ComponentUtil.FindComponent<Text>("Text", this);
-
-                    if (icon)
+                    if (_icon)
                     {
-                        icon.color = (Color) _originalIconColor;
+                        _icon.color = (Color) _originalIconColor;
                         _originalIconColor = null;
                     }
-                    if (text)
+                    if (_text)
                     {
-                        text.color = (Color) _originalTextColor;
+                        _text.color = (Color)_originalTextColor;
                         _originalTextColor = null;
                     }
                 }

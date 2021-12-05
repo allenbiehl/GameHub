@@ -8,17 +8,54 @@ using GameHub.Games.TicTacToe2D.Event;
 
 namespace GameHub.Games.TicTacToe2D.UI
 {
+    /// <summary>
+    /// class <c>NewSeriesModal</c> represents the modal for starting a new Tic Tac Toe
+    /// game series with an opponent. 
+    /// </summary>
     public class NewSeriesModal : MonoBehaviour
     {
+        /// <summary>
+        /// Instance variable <c>_instance</c> for storing the <c>NewSeriesModal</c>
+        /// singleton instance.
+        /// </summary>
         private static NewSeriesModal _instance;
 
-        public Dropdown opponentDropdown;
-        public Dropdown winLengthDropdown;
-        public Dropdown boardSizeDropdown;
+        /// <summary>
+        /// Instance variable <c>_opponentDropdown</c> is used to store the opponent dropdown.
+        /// </summary>
+        [SerializeField]
+        private Dropdown _opponentDropdown;
 
-        public Button startButton;
-        public Button cancelButton;
+        /// <summary>
+        /// Instance variable <c>_winLengthDropdown</c> is used to store the total number of
+        /// sequential pieces needed to win dropdown.
+        /// </summary>
+        [SerializeField]
+        private Dropdown _winLengthDropdown;
 
+        /// <summary>
+        /// Instance variable <c>_boardSizeDropdown</c> is used to store the size of the board
+        /// dropdown.
+        /// </summary>
+        [SerializeField]
+        private Dropdown _boardSizeDropdown;
+
+        /// <summary>
+        /// Instance variable <c>_startButton</c> is used to store the start game button.
+        /// </summary>
+        [SerializeField]
+        private Button _startButton;
+
+        /// <summary>
+        /// Instance variable <c>_startButton</c> is used to store the cancel game button.
+        /// </summary>
+        [SerializeField]
+        private Button _cancelButton;
+
+        /// <summary>
+        /// Property <c>Instance</c> returns the <c>NewSeriesModal</c> singleton 
+        /// instance.
+        /// </summary>
         public static NewSeriesModal Instance
         {
             get
@@ -31,100 +68,157 @@ namespace GameHub.Games.TicTacToe2D.UI
             }
         }
 
+        /// <summary>
+        /// Method <c>Start</c> handles all initialization routines.
+        /// </summary>
         private void Start()
         {
             Instance.Close();
 
-            opponentDropdown.ClearOptions();
-            List<Dropdown.OptionData> opponentOptions = new List<Dropdown.OptionData>
+            if (_opponentDropdown)
             {
-                new Dropdown.OptionData(Opponent.AIExpert),
-                new Dropdown.OptionData(Opponent.AIBeginner),
-                new Dropdown.OptionData(Opponent.MultiPlayer)
-            };
-            opponentDropdown.options = opponentOptions;
+                _opponentDropdown.ClearOptions();
+                List<Dropdown.OptionData> opponentOptions = new List<Dropdown.OptionData>
+                {
+                    new Dropdown.OptionData(Opponent.AIExpert),
+                    new Dropdown.OptionData(Opponent.AIBeginner),
+                    new Dropdown.OptionData(Opponent.MultiPlayer)
+                };
+                _opponentDropdown.options = opponentOptions;
+            }
 
-            winLengthDropdown.ClearOptions();
-            List<Dropdown.OptionData> winLengthOptions = new List<Dropdown.OptionData>
+            if (_winLengthDropdown)
             {
-                new Dropdown.OptionData("3"),
-                new Dropdown.OptionData("4"),
-                new Dropdown.OptionData("5"),
-                new Dropdown.OptionData("6")
-            };
-            winLengthDropdown.options = winLengthOptions;
+                _winLengthDropdown.ClearOptions();
+                List<Dropdown.OptionData> winLengthOptions = new List<Dropdown.OptionData>
+                {
+                    new Dropdown.OptionData("3"),
+                    new Dropdown.OptionData("4"),
+                    new Dropdown.OptionData("5"),
+                    new Dropdown.OptionData("6")
+                };
+                _winLengthDropdown.options = winLengthOptions;
+            }
 
-            boardSizeDropdown.ClearOptions();
-            List<Dropdown.OptionData> boardSizeOptions = new List<Dropdown.OptionData>
+            if (_boardSizeDropdown)
             {
-                new Dropdown.OptionData("3"),
-                new Dropdown.OptionData("4"),
-                new Dropdown.OptionData("5"),
-                new Dropdown.OptionData("6"),
-                new Dropdown.OptionData("7"),
-                new Dropdown.OptionData("8"),
-                new Dropdown.OptionData("9"),
-                new Dropdown.OptionData("10"),
-                new Dropdown.OptionData("11"),
-                new Dropdown.OptionData("12"),
-                new Dropdown.OptionData("13"),
-                new Dropdown.OptionData("14"),
-                new Dropdown.OptionData("15"),
-                new Dropdown.OptionData("16"),
-                new Dropdown.OptionData("17"),
-                new Dropdown.OptionData("18"),
-                new Dropdown.OptionData("19"),
-                new Dropdown.OptionData("20")
-            };
-            boardSizeDropdown.options = boardSizeOptions;
+                _boardSizeDropdown.ClearOptions();
+                List<Dropdown.OptionData> boardSizeOptions = new List<Dropdown.OptionData>
+                {
+                    new Dropdown.OptionData("3"),
+                    new Dropdown.OptionData("4"),
+                    new Dropdown.OptionData("5"),
+                    new Dropdown.OptionData("6"),
+                    new Dropdown.OptionData("7"),
+                    new Dropdown.OptionData("8"),
+                    new Dropdown.OptionData("9"),
+                    new Dropdown.OptionData("10"),
+                    new Dropdown.OptionData("11"),
+                    new Dropdown.OptionData("12"),
+                    new Dropdown.OptionData("13"),
+                    new Dropdown.OptionData("14"),
+                    new Dropdown.OptionData("15"),
+                    new Dropdown.OptionData("16"),
+                    new Dropdown.OptionData("17"),
+                    new Dropdown.OptionData("18"),
+                    new Dropdown.OptionData("19"),
+                    new Dropdown.OptionData("20")
+                };
+                _boardSizeDropdown.options = boardSizeOptions;
+            }
         }
 
+        /// <summary>
+        /// Method <c>Open</c> is used to open / show the modal to the user.
+        /// </summary>
+        /// <param name="onSave">
         public void Open()
         {
             SetActive(true);
 
-            startButton.onClick.RemoveAllListeners();
-            startButton.onClick.AddListener(() => {
-                SaveSettings();
-                StartSeries();
-            });
-            startButton.onClick.AddListener(Close);
-
-            cancelButton.onClick.RemoveAllListeners();
-            cancelButton.onClick.AddListener(Close);
+            if (_startButton)
+            {
+                _startButton.onClick.RemoveAllListeners();
+                _startButton.onClick.AddListener(() => {
+                    SaveSettings();
+                    StartSeries();
+                });
+                _startButton.onClick.AddListener(Close);
+            }
+            if (_cancelButton)
+            {
+                _cancelButton.onClick.RemoveAllListeners();
+                _cancelButton.onClick.AddListener(Close);
+            }
 
             PlayerSettings playerSettings = PlayerSettingsManager.Instance.GetSettings();
 
-            opponentDropdown.value = opponentDropdown.options
+            if (_opponentDropdown)
+            {
+                _opponentDropdown.value = _opponentDropdown.options
                 .FindIndex(option => option.text == playerSettings.Opponent);
-
-            winLengthDropdown.value = winLengthDropdown.options
+            }
+            if (_winLengthDropdown)
+            {
+                _winLengthDropdown.value = _winLengthDropdown.options
                 .FindIndex(option => option.text == playerSettings.LengthToWin.ToString());
-
-            boardSizeDropdown.value = boardSizeDropdown.options
+            }
+            if (_boardSizeDropdown)
+            {
+                _boardSizeDropdown.value = _boardSizeDropdown.options
                 .FindIndex(option => option.text == playerSettings.BoardSize.ToString());
+            }
         }
 
-        void Close()
+        /// <summary>
+        /// Method <c>Close</c> is used to close / hide the modal from the user.
+        /// </summary>
+        private void Close()
         {
             SetActive(false);
         }
 
-        void SetActive(bool active)
+        /// <summary>
+        /// Method <c>SetActive</c> is used to show or hide the modal.
+        /// </summary>
+        /// <param name="active">
+        /// <c>active</c> represent whether the modal should be visible (true)
+        /// or hidden (false).
+        /// </param>
+        private void SetActive(bool active)
         {
             Instance.gameObject.SetActive(active);
         }
 
-        void SaveSettings()
+        /// <summary>
+        /// Method <c>SaveSettings</c> is used to save <c>PlayerSettings</c> via the
+        /// <c>PlayerSettingsManager</c>.
+        /// </summary>
+        private void SaveSettings()
         {
             PlayerSettings settings = PlayerSettingsManager.Instance.GetSettings();
-            settings.Opponent = opponentDropdown.options[opponentDropdown.value].text;
-            settings.LengthToWin = Int32.Parse(winLengthDropdown.options[winLengthDropdown.value].text);
-            settings.BoardSize = Int32.Parse(boardSizeDropdown.options[boardSizeDropdown.value].text);
+
+            if (_opponentDropdown)
+            {
+                settings.Opponent = _opponentDropdown.options[_opponentDropdown.value].text;
+            }
+            if (_winLengthDropdown)
+            {
+                settings.LengthToWin = Int32.Parse(_winLengthDropdown.options[_winLengthDropdown.value].text);
+            }
+            if (_boardSizeDropdown)
+            {
+                settings.BoardSize = Int32.Parse(_boardSizeDropdown.options[_boardSizeDropdown.value].text);
+            }
             PlayerSettingsManager.Instance.SaveSettings(settings);
         }
 
-        void StartSeries()
+        /// <summary>
+        /// Method <c>StartSeries</c> is used to determine the next player in the series, 
+        /// start a new series via the game manager and then notify all new series event 
+        /// listeners that a new series was started.
+        /// </summary>
+        private void StartSeries()
         {
             PlayerSettings settings = PlayerSettingsManager.Instance.GetSettings();
 

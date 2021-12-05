@@ -1,24 +1,29 @@
 using UnityEngine;
-using UnityEngine.UI;
-using GameHub.Core.Util;
 
 namespace GameHub.Games.TicTacToe2D.UI
 {
+    /// <summary>
+    /// Class <c>SettingsButton</c> is used by the user to open the player settings modal.
+    /// </summary>
     public class SettingsButton : MonoBehaviour
     {
-        void Start()
+        /// <summary>
+        /// Method <c>OnOpenSettingsModal</c> is executed when the user clicks the 
+        /// Settings button at which point the system opens the <c>SettingsModal</c>
+        /// instance.
+        /// </summary>
+        public void OnOpenSettingsModal()
         {
-            Button button = ComponentUtil.GetComponent<Button>(this);
-
-            if (button)
-            {
-                button.onClick.AddListener(OpenSettings);
-            }
+            SettingsModal.Instance.Open(OnSave);
         }
 
-        private void OpenSettings()
+        /// <summary>
+        /// Method <c>OnSave</c> is used to handle any followup actions after the settings
+        /// are saved.
+        /// </summary>
+        private void OnSave()
         {
-            
+
         }
     }
 }
