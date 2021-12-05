@@ -47,7 +47,7 @@ namespace GameHub.Games.TicTacToe2D
 
         public GameSeries StartSeries(IPlayer player1, IPlayer player2)
         {
-            GameSeries = new GameSeries(this, player1, player2);
+            GameSeries = new GameSeries(player1, player2);
             return GameSeries;
         }
 
