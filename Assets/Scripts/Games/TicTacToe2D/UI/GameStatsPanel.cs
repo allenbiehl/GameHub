@@ -11,13 +11,18 @@ namespace GameHub.Games.TicTacToe2D.UI
     /// Class <c>GameStatePanel</c> represents the UI panel responsible for rendering
     /// game session stats which includes player colors, initials, and scores.
     /// </summary>
-    public class GameStatsPanel : MonoBehaviour
+    public class GameStatsPanel : MonoBehaviour, IDisposable
     {
         /// <summary>
         /// Instance variable <c>_gameManager</c> is used to control all game moves and 
         /// game state.
         /// </summary>
         private IGameManager _gameManager;
+
+        /// <summary>
+        /// Instance variable <c>_eventBus</c> is used to manage all game events.
+        /// </summary>
+        private IEventBus _eventBus;
 
         /// <summary>
         /// Instance variable <c>_player1AvatarIcon</c> is the player 1 icon and is
@@ -76,10 +81,29 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// <param name="gameManager">
         /// <c>gameManager</c> is used to control all game moves and game state.
         /// </param>
+        /// <param name="eventBus">
+        /// <c>eventBus</c> is used to manage game event subscription and notification.
+        /// </param>
         [Inject]
-        public void Setup(IGameManager gameManager)
+        public void Setup(IGameManager gameManager, IEventBus eventBus)
         {
+            _eventBus = eventBus;
             _gameManager = gameManager;
+
+            _eventBus.NewSeriesEvents.AddListener(OnNewSeries);
+            _eventBus.TieGameEvents.AddListener(OnTieGame);
+            _eventBus.PlayerWinEvents.AddListener(OnPlayerWin);
+        }
+
+        /// <summary>
+        /// Method <c>Dispose</c> is called when the class is destroyed and we need to 
+        /// clean up dependencies.
+        /// </summary>
+        public void Dispose()
+        {
+            _eventBus.NewSeriesEvents.RemoveListener(OnNewSeries);
+            _eventBus.TieGameEvents.RemoveListener(OnTieGame);
+            _eventBus.PlayerWinEvents.RemoveListener(OnPlayerWin);
         }
 
         /// <summary>
@@ -87,11 +111,7 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </summary>
         private void Start()
         {
-            _gameManager.GetEventBus().NewSeriesEvents.AddListener(OnNewSeries);
-            _gameManager.GetEventBus().TieGameEvents.AddListener(OnTieGame);
-            _gameManager.GetEventBus().PlayerWinEvents.AddListener(OnPlayerWin);
-
-            this.gameObject.SetActive(false);
+            gameObject.SetActive(false);
         }
 
         /// <summary>

@@ -18,15 +18,6 @@ namespace GameHub.Games.TicTacToe2D
         GameSeries GetGameSeries();
 
         /// <summary>
-        /// Method <c>GetEventBus</c> provides channels for notifying listeners
-        /// when particular events occur. 
-        /// </summary>
-        /// <returns>
-        /// <c>EventBus</c> is responsible for centrally managing event channels.
-        /// </returns>
-        EventBus GetEventBus();
-
-        /// <summary>
         /// Method <c>GetCurrentGame</c> is used to return the active game being
         /// played or the last game played if no new game was started.
         /// </summary>

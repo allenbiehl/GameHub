@@ -22,6 +22,11 @@ namespace GameHub.Games.TicTacToe2D.UI
         private IGameManager _gameManager;
 
         /// <summary>
+        /// Instance variable <c>_eventBus</c> is used to manage all game events.
+        /// </summary>
+        private IEventBus _eventBus;
+
+        /// <summary>
         /// Instance variable <c>_userInfoService</c> is responsible for managing
         /// the current user's <c>UserInfo</c>.
         /// </summary>
@@ -80,11 +85,13 @@ namespace GameHub.Games.TicTacToe2D.UI
         [Inject]
         public void Setup(
             IGameManager gameManager,
+            IEventBus eventBus,
             IUserInfoService userInfoService, 
             IPlayerSettingsService playerSettingsService
         )
         {
             _gameManager = gameManager;
+            _eventBus = eventBus;
             _userInfoService = userInfoService;
             _playerSettingsService = playerSettingsService;
         }
@@ -264,7 +271,7 @@ namespace GameHub.Games.TicTacToe2D.UI
             _gameManager.StartSeries(player1, player2);
 
             // Game is ready to start
-            _gameManager.GetEventBus().NewSeriesEvents.Notify(new GameEvent());
+            _eventBus.NewSeriesEvents.Notify(new GameEvent());
         }
     }
 }

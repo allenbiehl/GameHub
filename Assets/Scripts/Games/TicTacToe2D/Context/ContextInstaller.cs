@@ -1,6 +1,7 @@
 using Zenject;
 using GameHub.Core;
 using GameHub.Core.Security;
+using GameHub.Games.TicTacToe2D.Event;
 
 namespace GameHub.Games.TicTacToe2D.Context
 {
@@ -16,6 +17,7 @@ namespace GameHub.Games.TicTacToe2D.Context
         /// </summary>
         public override void InstallBindings()
         {
+            Container.Bind<IEventBus>().To<EventBus>().AsSingle();
             Container.Bind<IGameConfigLoader>().To<GameConfigLoader>().AsSingle();
             Container.Bind<IGameManager>().To<GameManager>().AsSingle();
             Container.Bind<IGameSettingsService>().To<GameSettingsService>().AsSingle();
