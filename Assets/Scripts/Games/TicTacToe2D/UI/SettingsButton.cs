@@ -8,13 +8,20 @@ namespace GameHub.Games.TicTacToe2D.UI
     public class SettingsButton : MonoBehaviour
     {
         /// <summary>
+        /// Instance variable <c>SettingsButton</c> represents the modal used to
+        /// start a new game series.
+        /// </summary>
+        [SerializeField]
+        private SettingsModal _settingsModal;
+
+        /// <summary>
         /// Method <c>OnOpenSettingsModal</c> is executed when the user clicks the 
         /// Settings button at which point the system opens the <c>SettingsModal</c>
         /// instance.
         /// </summary>
         public void OnOpenSettingsModal()
         {
-            SettingsModal.Instance.Open(OnSave);
+            _settingsModal.Open(OnSave);
         }
 
         /// <summary>
@@ -23,7 +30,6 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </summary>
         private void OnSave()
         {
-
         }
     }
 }

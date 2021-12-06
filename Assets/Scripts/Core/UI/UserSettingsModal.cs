@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using GameHub.Core.Security;
+using Zenject;
 
 namespace GameHub.Core.UI
 {
@@ -20,10 +21,10 @@ namespace GameHub.Core.UI
     public class UserSettingsModal : MonoBehaviour
     {
         /// <summary>
-        /// Instance variable <c>_instance</c> for storing the <c>UserSettingsModal</c>
-        /// singleton instance.
+        /// Instance variable <c>_userInfoService</c> is responsible for managing
+        /// the current user's <c>UserInfo</c>.
         /// </summary>
-        private static UserSettingsModal _instance;
+        private IUserInfoService _userInfoService;
 
         /// <summary>
         /// Class <c>Fields</c> is used to group all related UI field components.
@@ -59,19 +60,15 @@ namespace GameHub.Core.UI
         private Buttons _buttons = new Buttons();
 
         /// <summary>
-        /// Property <c>Instance</c> returns the <c>UserSettingsModal</c> singleton 
-        /// instance.
+        /// Method <c>Setup</c> is responsible for wiring up depedencies on object creation.
         /// </summary>
-        public static UserSettingsModal Instance
+        /// <param name="userInfoService">
+        /// <c>userInfoService</c> is reponsible for managing the current user's <c>UserInfo</c>
+        /// </param>
+        [Inject]
+        public void Setup(IUserInfoService userInfoService)
         {
-            get
-            {
-                if (!_instance)
-                {
-                    _instance = FindObjectOfType(typeof(UserSettingsModal)) as UserSettingsModal;
-                }
-                return _instance;
-            }
+            _userInfoService = userInfoService;
         }
 
         /// <summary>
@@ -79,7 +76,7 @@ namespace GameHub.Core.UI
         /// </summary>
         private void Start()
         {
-            Instance.Close();
+            Close();
         }
 
         /// <summary>
@@ -113,7 +110,7 @@ namespace GameHub.Core.UI
                 _buttons.CancelButton.onClick.AddListener(Close);
             }
 
-            UserInfo userInfo = UserInfoManager.Instance.GetUserInfo();
+            UserInfo userInfo = _userInfoService.GetUserInfo();
 
             if (_fields.UsernameField)
             {
@@ -146,7 +143,7 @@ namespace GameHub.Core.UI
         /// </param>
         private void SetActive(bool active)
         {
-            _instance.gameObject.SetActive(active);
+            gameObject.SetActive(active);
         }
 
         /// <summary>
@@ -159,7 +156,7 @@ namespace GameHub.Core.UI
         /// </param>
         private void SaveSettings(UnityAction onSave)
         {
-            UserInfo userInfo = UserInfoManager.Instance.GetUserInfo();
+            UserInfo userInfo = _userInfoService.GetUserInfo();
 
             if (_fields.UsernameField)
             {
@@ -173,7 +170,7 @@ namespace GameHub.Core.UI
             {
                 userInfo.FirstName = _fields.FirstNameField.text;
             }
-            UserInfoManager.Instance.SaveUserInfo(userInfo);
+            _userInfoService.SaveUserInfo(userInfo);
 
             onSave.Invoke();
         }

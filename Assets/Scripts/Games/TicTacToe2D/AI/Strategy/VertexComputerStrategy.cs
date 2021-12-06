@@ -4,13 +4,34 @@ using UnityEngine;
 
 namespace GameHub.Games.TicTacToe2D.AI.Strategy
 {
+    /// <summary>
+    /// Class <c>VertextComputerStrategy</c> is an experimental strategy design to 
+    /// address the scale limitations of the <c>Minimax</c> strategy.
+    /// </summary>
     public class VertexComputerStrategy : IComputerStrategy
     {
+        /// <summary>
+        /// Instance variable <c>_winTriangulation</c> is used to triangulate a win 
+        /// based on a board cell.
+        /// </summary>
         private WinPathTriangulation _winTriangulation = new WinPathTriangulation();
 
-        private int total;
-
-        PlayerMove IComputerStrategy.CalculateMove(GameSeries gameSeries, GameState gameState)
+        /// <summary>
+        /// Method <c>CalculateMove</c> is called by the AI player to make the best
+        /// move based on the selected strategy.
+        /// </summary>
+        /// <param name="gameSeries">
+        /// <c>gameSeries</c>  is the current series being played between both opponents.
+        /// The <c>gameSeries</c> includes a history of game play and can be used by the
+        /// AI to calculate moves based on predictable human strategies.
+        /// </param>
+        /// <param name="gameState">
+        /// <c>gameState</c> is the current game being played.
+        /// </param>
+        /// <returns>
+        /// Best <c>PlayerMove</c> made by the computer strategy implementation.
+        /// </returns>
+        public PlayerMove CalculateMove(GameSeries gameSeries, GameState gameState)
         {
             if (gameState.PlayerMoves.Count == 0)
             {
@@ -22,6 +43,21 @@ namespace GameHub.Games.TicTacToe2D.AI.Strategy
             }
         }
 
+        /// <summary>
+        /// Method <c>GetInitialMove</c> is used when the AI player is the offensive player
+        /// and they need to make the first game board move.
+        /// </summary>
+        /// <param name="gameSeries">
+        /// <c>gameSeries</c>  is the current series being played between both opponents.
+        /// The <c>gameSeries</c> includes a history of game play and can be used by the
+        /// AI to calculate moves based on predictable human strategies.
+        /// </param>
+        /// <param name="gameState">
+        /// <c>gameState</c> is the current game being played.
+        /// </param>
+        /// <returns>
+        /// Best <c>PlayerMove</c> made by the computer strategy implementation.
+        /// </returns>
         private PlayerMove GetInitialMove(GameSeries gameSeries, GameState gameState)
         {
             List<GameBoardCell> availableCells = gameState.GameBoard.AvailableCells;
@@ -29,6 +65,21 @@ namespace GameHub.Games.TicTacToe2D.AI.Strategy
             return new PlayerMove(gameSeries.Player2, cell.Row, cell.Column);
         }
 
+        /// <summary>
+        /// Method <c>GetVertexMove</c> is used on subsequent moves as this algorithm is 
+        /// based on the players last move and is defensive in nature.
+        /// </summary>
+        /// <param name="gameSeries">
+        /// <c>gameSeries</c>  is the current series being played between both opponents.
+        /// The <c>gameSeries</c> includes a history of game play and can be used by the
+        /// AI to calculate moves based on predictable human strategies.
+        /// </param>
+        /// <param name="gameState">
+        /// <c>gameState</c> is the current game being played.
+        /// </param>
+        /// <returns>
+        /// Best <c>PlayerMove</c> made by the computer strategy implementation.
+        /// </returns>
         private PlayerMove GetVertexMove(GameSeries gameSeries, GameState gameState)
         {
             PlayerMove player1Move = gameState.PlayerMoves.Last();
@@ -62,6 +113,23 @@ namespace GameHub.Games.TicTacToe2D.AI.Strategy
             return new PlayerMove(gameSeries.Player2, move[0], move[1]);
         }
 
+        /// <summary>
+        /// Method <c>GetBestMove</c> is used to get the best available move based on the 
+        /// player vertex. This algorith checks all four axis and determines the weight 
+        /// of each axis. 
+        /// </summary>
+        /// <param name="cells">
+        /// <c>cells</c> is a two dimensional array of all game board cells.
+        /// </param>
+        /// <param name="vertex">
+        /// <c>vertext</c> is the coordinates of the last play made by the specified player.
+        /// </param>
+        /// <param name="player">
+        /// <c>player</c> is the player to target against.
+        /// </param>
+        /// <returns>
+        /// Coordinates of the best game board cell move available.
+        /// </returns>
         private int[] GetBestMove( int[,] cells, int[] vertex, int player )
         {
             int boardSize = cells.GetLength(0);
@@ -135,6 +203,15 @@ namespace GameHub.Games.TicTacToe2D.AI.Strategy
             return bestMove;
         }
 
+        /// <summary>
+        /// Method <c>AvailableCells</c> is used to filter all available cells from the game board.
+        /// </summary>
+        /// <param name="board">
+        /// <c>board</c> is the 2 dimensional array of game board cell coordinates.
+        /// </param>
+        /// <returns>
+        /// List of available game board cells.
+        /// </returns>
         private List<int[]> AvailableCells(int[,] board)
         {
             List<int[]> available = new List<int[]>();
@@ -151,10 +228,21 @@ namespace GameHub.Games.TicTacToe2D.AI.Strategy
             return available;
         }
 
+        /// <summary>
+        /// Class <c>ScoreCard</c> represents the score card associated with a specific axis, 
+        /// whether row, column, diagonal right and diagonal left. Each axis is comprised of
+        /// left and right parts. i.e. row = east and west.
+        /// </summary>
         private class ScoreCard
         {
+            /// <summary>
+            /// Property <c>Direction</c> is a collection of directions that comprise the axis.
+            /// </summary>
             public List<ScoreCardDirection> Directions { get; set; }
 
+            /// <summary>
+            /// Property <c>Value</c> represents the combined value of both directions.
+            /// </summary>
             public float Value 
             { 
                 get
@@ -168,6 +256,10 @@ namespace GameHub.Games.TicTacToe2D.AI.Strategy
                 }
             }
 
+            /// <summary>
+            /// Property <c>BestAvailableCell</c> is the best calculated as compared to each 
+            /// direction.
+            /// </summary>
             public int[] BestAvailableCell
             {
                 get
@@ -187,6 +279,15 @@ namespace GameHub.Games.TicTacToe2D.AI.Strategy
                 }
             }
 
+            /// <summary>
+            /// Constructor for the <c>ScoreCard</c>.
+            /// </summary>
+            /// <param name="leftOffset">
+            /// <c>leftOffset</c> is the left axis direction. i.e. west.
+            /// </param>
+            /// <param name="rightOffset">
+            /// <c>rightOffset</c> is the right axis direction. i.e. east.
+            /// </param>
             public ScoreCard( int[] leftOffset, int[] rightOffset )
             {
                 List<ScoreCardDirection> directions = new List<ScoreCardDirection>();
@@ -196,6 +297,12 @@ namespace GameHub.Games.TicTacToe2D.AI.Strategy
             }
         }
 
+        /// <summary>
+        /// Class <c>ScoreCardDirection</c> represents the individual score and cells 
+        /// associated with a specific direction. Each direction is used to determine 
+        /// the most likely attack axis and then choose the most likely attack direction 
+        /// based on the vertex.
+        /// </summary>
         private class ScoreCardDirection
         {
             public int[] Offset { get; set; }
@@ -213,6 +320,10 @@ namespace GameHub.Games.TicTacToe2D.AI.Strategy
             }
         }
 
+        /// <summary>
+        /// Class <c>OffsetDirection</c> represents the offset coordinates that represent 
+        /// a direction from the vertex.
+        /// </summary>
         public struct OffsetDirection
         {
             public static int[] North = new int[] { -1, 0 };

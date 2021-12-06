@@ -1,41 +1,30 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using GameHub.Core.Util;
+using Zenject;
 
 namespace GameHub.Core
 {
     /// <summary>
-    /// Class <c>GameConfigLoader</c> provides the ability to retrieve a list of 
+    /// Class <c>GameConfigService</c> provides the ability to retrieve a list of 
     /// all available game configurations that can be played.
     /// </summary>
-    public class GameConfigLoader
+    public class GameConfigLoader : IGameConfigLoader
     {
         /// <summary>
-        /// Instance variable <c>_instance</c> stores the <c>GameConfigLoader</c>
-        /// singleton instance.
+        /// Instance variable <c>_resourceLoader</c> is used load system resources.s
         /// </summary>
-        private static readonly Lazy<GameConfigLoader> _instance =
-            new Lazy<GameConfigLoader>(() => new GameConfigLoader());
+        private IResourceLoader _resourceLoader;
 
         /// <summary>
-        /// Method <c>Instance</c> returns the <c>GameConfigLoader</c> singleton 
-        /// instance.
+        /// Constructor for <c>GameConfigLoader</c>
         /// </summary>
-        public static GameConfigLoader Instance
+        /// <param name="gameSettingsService">
+        /// <c>resourceLoader</c> is used to load system resources.
+        /// </param>
+        [Inject]
+        public GameConfigLoader(IResourceLoader resourceLoader)
         {
-            get
-            {
-                return _instance.Value;
-            }
-        }
-
-        /// <summary>
-        /// Private constructor to ensure the <c>GameConfigLoader</c> cannot 
-        /// be instantiated externally.
-        /// </summary>
-        private GameConfigLoader()
-        {
+            _resourceLoader = resourceLoader;
         }
 
         /// <summary>
@@ -48,7 +37,7 @@ namespace GameHub.Core
             Sprite sprite;
             List<GameConfig> gameConfigs = new List<GameConfig>();
 
-            sprite = SpriteLoader.Instance.Load("grid");
+            sprite = _resourceLoader.LoadSprite("grid");
             gameConfigs.Add(new GameConfig("Tic Tac Toe 2D", "TicTacToe2D", sprite));
 
             //sprite = SpriteLoader.Load("rubik");

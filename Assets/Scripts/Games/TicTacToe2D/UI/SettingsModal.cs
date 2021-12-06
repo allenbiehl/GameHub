@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using Zenject;
 
 namespace GameHub.Games.TicTacToe2D.UI
 {
@@ -13,10 +14,10 @@ namespace GameHub.Games.TicTacToe2D.UI
     public class SettingsModal : MonoBehaviour
     {
         /// <summary>
-        /// Instance variable <c>_instance</c> for storing the <c>SettingsModal</c>
-        /// singleton instance.
+        /// Instance variable <c>_playerSettingsService</c> is used to retrieve and persist 
+        /// player game settings across game sessions.
         /// </summary>
-        private static SettingsModal _instance;
+        private IPlayerSettingsService _playerSettingsService;
 
         /// <summary>
         /// Instance variable <c>_winLengthDropdown</c> is used to store the total number of
@@ -45,19 +46,15 @@ namespace GameHub.Games.TicTacToe2D.UI
         private Button _cancelButton;
 
         /// <summary>
-        /// Property <c>Instance</c> returns the <c>SettingsModal</c> singleton 
-        /// instance.
+        /// Method <c>Setup</c> is responsible for wiring up depedencies on object creation.
         /// </summary>
-        public static SettingsModal Instance
+        /// <param name="playerSettingsService">
+        /// <c>playerSettingsService</c> is used to retrieve and persist player game settings.
+        /// </param>
+        [Inject]
+        public void Setup(IPlayerSettingsService playerSettingsService)
         {
-            get
-            {
-                if (!_instance)
-                {
-                    _instance = FindObjectOfType(typeof(SettingsModal)) as SettingsModal;
-                }
-                return _instance;
-            }
+            _playerSettingsService = playerSettingsService;
         }
 
         /// <summary>
@@ -65,7 +62,7 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </summary>
         private void Start()
         {
-            Instance.Close();
+            Close();
 
             if (_winLengthDropdown)
             {
@@ -134,7 +131,7 @@ namespace GameHub.Games.TicTacToe2D.UI
                 _cancelButton.onClick.AddListener(Close);
             }
 
-            PlayerSettings playerSettings = PlayerSettingsManager.Instance.GetSettings();
+            PlayerSettings playerSettings = _playerSettingsService.GetSettings();
 
             if (_winLengthDropdown)
             {
@@ -165,7 +162,7 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </param>
         private void SetActive(bool active)
         {
-            _instance.gameObject.SetActive(active);
+            gameObject.SetActive(active);
         }
 
         /// <summary>
@@ -178,7 +175,7 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </param>
         private void SaveSettings(UnityAction onSave)
         {
-            PlayerSettings settings = PlayerSettingsManager.Instance.GetSettings();
+            PlayerSettings settings = _playerSettingsService.GetSettings();
 
             if (_winLengthDropdown)
             {
@@ -188,7 +185,7 @@ namespace GameHub.Games.TicTacToe2D.UI
             {
                 settings.BoardSize = Int32.Parse(_boardSizeDropdown.options[_boardSizeDropdown.value].text);
             }
-            PlayerSettingsManager.Instance.SaveSettings(settings);
+            _playerSettingsService.SaveSettings(settings);
 
             onSave.Invoke();
         }

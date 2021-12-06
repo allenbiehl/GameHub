@@ -8,13 +8,5 @@ namespace GameHub.Games.TicTacToe2D.UI
     /// </summary>
     public class GameLoaderPanel : MonoBehaviour
     {
-
-        /// <summary>
-        /// Method <c>Awake</c> is used to initialize / reset the <c>GameManager</c> instance.
-        /// </summary>
-        private void Awake()
-        {
-            GameManager.Initialize();
-        }
     }
 }

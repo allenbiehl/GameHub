@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Zenject;
 
 namespace GameHub.Core.UI
 {
@@ -13,10 +14,21 @@ namespace GameHub.Core.UI
     public class GamesPanel : MonoBehaviour
     {
         /// <summary>
+        /// Instance variable <c>_sceneLoader</c> is used to load scenes.
+        /// </summary>
+        private ISceneLoader _sceneLoader;
+
+        /// <summary>
         /// Instance variable <c>_gameConfigs</c> is the list of game configurations 
         /// available to play and is cached to speed up search performance.
         /// </summary>
         private List<GameConfig> _gameConfigs = new List<GameConfig>();
+
+        /// <summary>
+        /// Instance variable <c>_gameConfigLoader</c> is responsible for loading
+        /// all available game configurations.
+        /// </summary>
+        private IGameConfigLoader _gameConfigLoader;
 
         /// <summary>
         /// Instance variable <c>_gameObjectMaterial</c> is the game material 
@@ -33,11 +45,27 @@ namespace GameHub.Core.UI
         private RectTransform _gameListBody;
 
         /// <summary>
+        /// Method <c>Setup</c> is responsible for wiring up depedencies on object creation.
+        /// </summary>
+        /// <param name="gameConfigLoader">
+        /// <c>gameConfigLoader</c> is reponsible for loading available game configurations.
+        /// </param>
+        /// <param name="playerSettingsService">
+        /// <c>playerSettingsService</c> is used to load scenes.
+        /// </param>
+        [Inject]
+        public void Setup(IGameConfigLoader gameConfigLoader, ISceneLoader sceneLoader)
+        {
+            _gameConfigLoader = gameConfigLoader;
+            _sceneLoader = sceneLoader;
+        }
+
+        /// <summary>
         /// Method <c>Start</c> is used to intialize the <c>GamePanel</c>.
         /// </summary>
         public void Start()
         {
-            List<GameConfig> gameSource = GameConfigLoader.Instance.Load();
+            List<GameConfig> gameSource = _gameConfigLoader.Load();
 
             if (gameSource != null)
             {
@@ -123,7 +151,7 @@ namespace GameHub.Core.UI
                     image.HoverColor = new Color(.2f, .2f, .2f, 1);
 
                     Button menuBtn = gameListRow.AddComponent<Button>();
-                    menuBtn.onClick.AddListener(() => SceneLoader.Instance.Load(config.Scene, true));
+                    menuBtn.onClick.AddListener(() => _sceneLoader.Load(config.Scene, true));
 
                     // Add Name cell
                     GameObject nameCell = new GameObject($"GameListRow{i}Name");

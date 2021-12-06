@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using GameHub.Core.Security;
 using GameHub.Games.TicTacToe2D.AI;
 using GameHub.Games.TicTacToe2D.Event;
+using Zenject;
 
 namespace GameHub.Games.TicTacToe2D.UI
 {
@@ -15,10 +16,22 @@ namespace GameHub.Games.TicTacToe2D.UI
     public class NewSeriesModal : MonoBehaviour
     {
         /// <summary>
-        /// Instance variable <c>_instance</c> for storing the <c>NewSeriesModal</c>
-        /// singleton instance.
+        /// Instance variable <c>_gameManager</c> is used to control all game moves and 
+        /// game state.
         /// </summary>
-        private static NewSeriesModal _instance;
+        private IGameManager _gameManager;
+
+        /// <summary>
+        /// Instance variable <c>_userInfoService</c> is responsible for managing
+        /// the current user's <c>UserInfo</c>.
+        /// </summary>
+        private IUserInfoService _userInfoService;
+
+        /// <summary>
+        /// Instance variable <c>_playerSettingsService</c> is used to retrieve and persist 
+        /// player game settings across game sessions.
+        /// </summary>
+        private IPlayerSettingsService _playerSettingsService;
 
         /// <summary>
         /// Instance variable <c>_opponentDropdown</c> is used to store the opponent dropdown.
@@ -53,19 +66,27 @@ namespace GameHub.Games.TicTacToe2D.UI
         private Button _cancelButton;
 
         /// <summary>
-        /// Property <c>Instance</c> returns the <c>NewSeriesModal</c> singleton 
-        /// instance.
+        /// Method <c>Setup</c> is responsible for wiring up depedencies on object creation.
         /// </summary>
-        public static NewSeriesModal Instance
+        /// <param name="gameManager">
+        /// <c>gameManager</c> is used to control all game moves and game state.
+        /// </param>
+        /// <param name="userInfoService">
+        /// <c>userInfoService</c> is reponsible for managing the current user's <c>UserInfo</c>
+        /// </param>
+        /// <param name="playerSettingsService">
+        /// <c>playerSettingsService</c> is used to retrieve and persist player game settings.
+        /// </param>
+        [Inject]
+        public void Setup(
+            IGameManager gameManager,
+            IUserInfoService userInfoService, 
+            IPlayerSettingsService playerSettingsService
+        )
         {
-            get
-            {
-                if (!_instance)
-                {
-                    _instance = FindObjectOfType(typeof(NewSeriesModal)) as NewSeriesModal;
-                }
-                return _instance;
-            }
+            _gameManager = gameManager;
+            _userInfoService = userInfoService;
+            _playerSettingsService = playerSettingsService;
         }
 
         /// <summary>
@@ -73,7 +94,7 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </summary>
         private void Start()
         {
-            Instance.Close();
+            Close();
 
             if (_opponentDropdown)
             {
@@ -151,7 +172,7 @@ namespace GameHub.Games.TicTacToe2D.UI
                 _cancelButton.onClick.AddListener(Close);
             }
 
-            PlayerSettings playerSettings = PlayerSettingsManager.Instance.GetSettings();
+            PlayerSettings playerSettings = _playerSettingsService.GetSettings();
 
             if (_opponentDropdown)
             {
@@ -187,7 +208,7 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </param>
         private void SetActive(bool active)
         {
-            Instance.gameObject.SetActive(active);
+            gameObject.SetActive(active);
         }
 
         /// <summary>
@@ -196,7 +217,7 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </summary>
         private void SaveSettings()
         {
-            PlayerSettings settings = PlayerSettingsManager.Instance.GetSettings();
+            PlayerSettings settings = _playerSettingsService.GetSettings();
 
             if (_opponentDropdown)
             {
@@ -210,7 +231,7 @@ namespace GameHub.Games.TicTacToe2D.UI
             {
                 settings.BoardSize = Int32.Parse(_boardSizeDropdown.options[_boardSizeDropdown.value].text);
             }
-            PlayerSettingsManager.Instance.SaveSettings(settings);
+            _playerSettingsService.SaveSettings(settings);
         }
 
         /// <summary>
@@ -220,12 +241,9 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </summary>
         private void StartSeries()
         {
-            PlayerSettings settings = PlayerSettingsManager.Instance.GetSettings();
-
-            IPlayer player1 = new HumanPlayer(
-                UserInfoManager.Instance.GetUserInfo(),
-                PlayerSettingsManager.Instance.GetSettings()
-            );
+            PlayerSettings settings = _playerSettingsService.GetSettings();
+            UserInfo player1UserInfo = _userInfoService.GetUserInfo();
+            IPlayer player1 = new HumanPlayer(player1UserInfo, settings);
 
             IPlayer player2;
             
@@ -239,17 +257,14 @@ namespace GameHub.Games.TicTacToe2D.UI
             }
             else
             {
-                player2 = new HumanPlayer(
-                    UserInfoManager.Instance.GetUserInfo(),
-                    PlayerSettings.Omega
-                );
+                player2 = new HumanPlayer(player1UserInfo, PlayerSettings.Omega);
             }
 
             // Create new series
-            GameManager.Instance.StartSeries(player1, player2);
+            _gameManager.StartSeries(player1, player2);
 
             // Game is ready to start
-            GameManager.Instance.EventBus.NewSeriesEvents.Notify(new GameEvent());
+            _gameManager.GetEventBus().NewSeriesEvents.Notify(new GameEvent());
         }
     }
 }
