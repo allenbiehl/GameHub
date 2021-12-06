@@ -14,6 +14,12 @@ namespace GameHub.Games.TicTacToe2D.UI
     public class GameBoardPanel : MonoBehaviour
     {
         /// <summary>
+        /// Instance variable <c>_gameManager</c> is used to control all game moves and 
+        /// game state.
+        /// </summary>
+        private IGameManager _gameManager;
+
+        /// <summary>
         /// Instance variable <c>_playerSettingsService</c> is used to retrieve and persist 
         /// player game settings across game sessions.
         /// </summary>
@@ -78,6 +84,9 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// <summary>
         /// Method <c>Setup</c> is responsible for wiring up depedencies on object creation.
         /// </summary>
+        /// <param name="gameManager">
+        /// <c>gameManager</c> is used to control all game moves and game state.
+        /// </param>
         /// <param name="playerSettingsService">
         /// <c>playerSettingsService</c> is used to retrieve and persist player game settings.
         /// </param>
@@ -85,8 +94,13 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// <c>playerSettingsService</c> is used to load scenes.
         /// </param>
         [Inject]
-        public void Setup(IPlayerSettingsService playerSettingsService, ISceneLoader sceneLoader)
+        public void Setup(
+            IGameManager gameManager, 
+            IPlayerSettingsService playerSettingsService, 
+            ISceneLoader sceneLoader
+        )
         {
+            _gameManager = gameManager;
             _playerSettingsService = playerSettingsService;
             _sceneLoader = sceneLoader;
         }
@@ -96,11 +110,11 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </summary>
         private void Start()
         {
-            GameManager.Instance.EventBus.NewSeriesEvents.AddListener(OnNewGame);
-            GameManager.Instance.EventBus.NewGameEvents.AddListener(OnNewGame);
-            GameManager.Instance.EventBus.TieGameEvents.AddListener(OnTieGame);
-            GameManager.Instance.EventBus.PlayerClaimEvents.AddListener(OnPlayerClaim);
-            GameManager.Instance.EventBus.PlayerWinEvents.AddListener(OnPlayerWin);
+            _gameManager.GetEventBus().NewSeriesEvents.AddListener(OnNewGame);
+            _gameManager.GetEventBus().NewGameEvents.AddListener(OnNewGame);
+            _gameManager.GetEventBus().TieGameEvents.AddListener(OnTieGame);
+            _gameManager.GetEventBus().PlayerClaimEvents.AddListener(OnPlayerClaim);
+            _gameManager.GetEventBus().PlayerWinEvents.AddListener(OnPlayerWin);
         }
 
         /// <summary>
@@ -199,7 +213,7 @@ namespace GameHub.Games.TicTacToe2D.UI
         public void OnPlayerClaim( PlayerClaimEvent eventType )
         {
             PlayerMove playerMove = eventType.PlayerMove;
-            GameState gameState = GameManager.Instance.CurrentGame;
+            GameState gameState = _gameManager.GetCurrentGame();
 
             Transform gameBoard = transform.Find($"GameBoard{_boardId}");
             string tileName = $"GameBoard{_boardId}{playerMove.Row}{playerMove.Column}";
@@ -235,15 +249,14 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </summary>
         private void NewGame()
         {
-            GameManager manager = GameManager.Instance;
             PlayerSettings settings = _playerSettingsService.GetSettings();
 
             GameBoard gameBoard = new GameBoard(settings.BoardSize);
-            GameState gameState = manager.InitializeGame(gameBoard, settings.LengthToWin);
+            GameState gameState = _gameManager.InitializeGame(gameBoard, settings.LengthToWin);
 
             BuildGameBoard(gameState);
 
-            manager.StartGame();
+            _gameManager.StartGame();
 
             _boardClickEnabled = true;
         }
@@ -324,7 +337,7 @@ namespace GameHub.Games.TicTacToe2D.UI
                         {
                             int row = (int) rowCoordinates.x;
                             int col = (int) rowCoordinates.y;
-                            GameManager.Instance.EventBus.BoardClickEvents
+                            _gameManager.GetEventBus().BoardClickEvents
                                 .Notify(new BoardClickEvent(row, col));
                         }
                     });

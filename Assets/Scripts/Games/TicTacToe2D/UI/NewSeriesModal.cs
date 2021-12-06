@@ -16,6 +16,12 @@ namespace GameHub.Games.TicTacToe2D.UI
     public class NewSeriesModal : MonoBehaviour
     {
         /// <summary>
+        /// Instance variable <c>_gameManager</c> is used to control all game moves and 
+        /// game state.
+        /// </summary>
+        private IGameManager _gameManager;
+
+        /// <summary>
         /// Instance variable <c>_userInfoService</c> is responsible for managing
         /// the current user's <c>UserInfo</c>.
         /// </summary>
@@ -62,6 +68,9 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// <summary>
         /// Method <c>Setup</c> is responsible for wiring up depedencies on object creation.
         /// </summary>
+        /// <param name="gameManager">
+        /// <c>gameManager</c> is used to control all game moves and game state.
+        /// </param>
         /// <param name="userInfoService">
         /// <c>userInfoService</c> is reponsible for managing the current user's <c>UserInfo</c>
         /// </param>
@@ -69,8 +78,13 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// <c>playerSettingsService</c> is used to retrieve and persist player game settings.
         /// </param>
         [Inject]
-        public void Setup(IUserInfoService userInfoService, IPlayerSettingsService playerSettingsService)
+        public void Setup(
+            IGameManager gameManager,
+            IUserInfoService userInfoService, 
+            IPlayerSettingsService playerSettingsService
+        )
         {
+            _gameManager = gameManager;
             _userInfoService = userInfoService;
             _playerSettingsService = playerSettingsService;
         }
@@ -247,10 +261,10 @@ namespace GameHub.Games.TicTacToe2D.UI
             }
 
             // Create new series
-            GameManager.Instance.StartSeries(player1, player2);
+            _gameManager.StartSeries(player1, player2);
 
             // Game is ready to start
-            GameManager.Instance.EventBus.NewSeriesEvents.Notify(new GameEvent());
+            _gameManager.GetEventBus().NewSeriesEvents.Notify(new GameEvent());
         }
     }
 }

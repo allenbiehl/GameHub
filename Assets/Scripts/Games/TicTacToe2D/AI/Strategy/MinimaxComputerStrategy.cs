@@ -2,9 +2,30 @@ using System.Collections.Generic;
 
 namespace GameHub.Games.TicTacToe2D.AI.Strategy
 {
+    /// <summary>
+    /// Class <c>MinimaxComputerStrategy</c> represents the unbeatable strategy used
+    /// for 3 x 3 board sizes. Due to the nature of this algorithm which plays the entire
+    /// game before making a move, the strategy does not scale well and an alternate 
+    /// strategy should be used for board sizes greater than 3 x 3.
+    /// </summary>
     public class MinimaxComputerStrategy : IComputerStrategy
     {
-        PlayerMove IComputerStrategy.CalculateMove(GameSeries gameSeries, GameState gameState)
+        /// <summary>
+        /// Method <c>CalculateMove</c> is called by the AI player to make the best
+        /// move based on the selected strategy.
+        /// </summary>
+        /// <param name="gameSeries">
+        /// <c>gameSeries</c>  is the current series being played between both opponents.
+        /// The <c>gameSeries</c> includes a history of game play and can be used by the
+        /// AI to calculate moves based on predictable human strategies.
+        /// </param>
+        /// <param name="gameState">
+        /// <c>gameState</c> is the current game being played.
+        /// </param>
+        /// <returns>
+        /// Best <c>PlayerMove</c> made by the computer strategy implementation.
+        /// </returns>
+        public PlayerMove CalculateMove(GameSeries gameSeries, GameState gameState)
         {
             GameBoardCell[,] sourceCells = gameState.GameBoard.Cells;
             int boardSize = gameState.GameBoard.Size;
@@ -39,7 +60,21 @@ namespace GameHub.Games.TicTacToe2D.AI.Strategy
             return new PlayerMove(gameSeries.Player2, moveRow, moveCol);
         }
 
-        Move Minimax(int[] board, int playerId)
+        /// <summary>
+        /// Method <c>Minimax</c> is used to select the best move possible based 
+        /// on the avialable game board cells.
+        /// </summary>
+        /// <param name="board">
+        /// <c>board</c> is a one dimensional array of game cells.
+        /// </param>
+        /// <param name="playerId">
+        /// <c>playerId</c> is the player who made the last move and we check 
+        /// for a win.
+        /// </param>
+        /// <returns>
+        /// <c>Move</c> is the best player move available.
+        /// </returns>
+        private Move Minimax(int[] board, int playerId)
         {
             int[] available = Available(board);
 
@@ -115,6 +150,16 @@ namespace GameHub.Games.TicTacToe2D.AI.Strategy
             return bestMove;
         }
 
+        /// <summary>
+        /// Method <c>Available</c> returns an array that contains 
+        /// all available cells.
+        /// </summary>
+        /// <param name="board">
+        /// <c>board</c> is the array of all game board cells.
+        /// </param>
+        /// <returns>
+        /// Array of available game board cells.
+        /// </returns>
         private int[] Available(int[] board)
         {
             List<int> available = new List<int>();
@@ -128,6 +173,19 @@ namespace GameHub.Games.TicTacToe2D.AI.Strategy
             return available.ToArray();
         }
 
+        /// <summary>
+        /// Method <c>Winning</c> calculates whether the player won the game based on 
+        /// the winning strategies.
+        /// </summary>
+        /// <param name="board">
+        /// <c>board</c> is the array of all game board cells.
+        /// </param>
+        /// <param name="player">
+        /// <c>player</c> is the current player to evaluate for a win.
+        /// </param>
+        /// <returns>
+        /// Boolean value whether the player won.
+        /// </returns>
         private bool Winning(int[] board, int player)
         {
             if (
@@ -149,9 +207,21 @@ namespace GameHub.Games.TicTacToe2D.AI.Strategy
             }
         }
 
+        /// <summary>
+        /// Struct <c>Move</c> is used to store the move score and coordinate location.
+        /// </summary>
         private struct Move
         {
+            /// <summary>
+            /// Instance variable <c>score</c> is the weighted value of the move that 
+            /// is compared against other moves.
+            /// </summary>
             public int score;
+
+            /// <summary>
+            /// Instance variable <c>index</c> is the 0 based coordinate of the game 
+            /// board cell.
+            /// </summary>
             public int index;
         }
     }

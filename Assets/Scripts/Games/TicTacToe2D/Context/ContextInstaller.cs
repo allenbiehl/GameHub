@@ -17,9 +17,10 @@ namespace GameHub.Games.TicTacToe2D.Context
         public override void InstallBindings()
         {
             Container.Bind<IGameConfigLoader>().To<GameConfigLoader>().AsSingle();
+            Container.Bind<IGameManager>().To<GameManager>().AsSingle();
             Container.Bind<IGameSettingsService>().To<GameSettingsService>().AsSingle();
             Container.Bind<IPlayerSettingsService>().To<PlayerSettingsService>().AsSingle();
-            //Container.Bind<IResourceLoader>().To<ResourceLoader>().AsSingle();
+            Container.Bind<IResourceLoader>().To<ResourceLoader>().AsSingle();
             Container.Bind<ISceneLoader>().To<SceneLoader>().AsSingle();
             Container.Bind<IUserInfoService>().To<UserInfoService>().AsSingle();
         }

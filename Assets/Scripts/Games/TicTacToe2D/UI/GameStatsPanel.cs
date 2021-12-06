@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using GameHub.Games.TicTacToe2D.Event;
 using TMPro;
+using Zenject;
 
 namespace GameHub.Games.TicTacToe2D.UI
 {
@@ -12,6 +13,12 @@ namespace GameHub.Games.TicTacToe2D.UI
     /// </summary>
     public class GameStatsPanel : MonoBehaviour
     {
+        /// <summary>
+        /// Instance variable <c>_gameManager</c> is used to control all game moves and 
+        /// game state.
+        /// </summary>
+        private IGameManager _gameManager;
+
         /// <summary>
         /// Instance variable <c>_player1AvatarIcon</c> is the player 1 icon and is
         /// used to color coded according to the player 1 color scheme, which includes
@@ -64,13 +71,25 @@ namespace GameHub.Games.TicTacToe2D.UI
         private TMP_Text _tieScore;
 
         /// <summary>
+        /// Method <c>Setup</c> is responsible for wiring up depedencies on object creation.
+        /// </summary>
+        /// <param name="gameManager">
+        /// <c>gameManager</c> is used to control all game moves and game state.
+        /// </param>
+        [Inject]
+        public void Setup(IGameManager gameManager)
+        {
+            _gameManager = gameManager;
+        }
+
+        /// <summary>
         /// Method <c>Start</c> is used to initialze the component.
         /// </summary>
         private void Start()
         {
-            GameManager.Instance.EventBus.NewSeriesEvents.AddListener(OnNewSeries);
-            GameManager.Instance.EventBus.TieGameEvents.AddListener(OnTieGame);
-            GameManager.Instance.EventBus.PlayerWinEvents.AddListener(OnPlayerWin);
+            _gameManager.GetEventBus().NewSeriesEvents.AddListener(OnNewSeries);
+            _gameManager.GetEventBus().TieGameEvents.AddListener(OnTieGame);
+            _gameManager.GetEventBus().PlayerWinEvents.AddListener(OnPlayerWin);
 
             this.gameObject.SetActive(false);
         }
@@ -98,7 +117,7 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </param>
         private void OnPlayerWin(PlayerWinEvent eventType)
         {
-            if (eventType.Player == GameManager.Instance.GameSeries.Player1)
+            if (eventType.Player == _gameManager.GetGameSeries().Player1)
             {
                 int score = Int32.Parse(_player1Score.text) + 1;
                 SetPlayer1Score(score);
@@ -120,7 +139,7 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </param>
         private void OnNewSeries(GameEvent eventType)
         {
-            GameSeries series = GameManager.Instance.GameSeries;
+            GameSeries series = _gameManager.GetGameSeries();
 
             if (series != null)
             {
