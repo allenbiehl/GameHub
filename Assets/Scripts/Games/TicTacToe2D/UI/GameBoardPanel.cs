@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using GameHub.Core;
 using GameHub.Games.TicTacToe2D.Event;
 using Zenject;
+using TMPro;
 
 namespace GameHub.Games.TicTacToe2D.UI
 {
@@ -11,13 +13,18 @@ namespace GameHub.Games.TicTacToe2D.UI
     /// Class <c>GameBoardPanel</c> represents the panel where the game board grid
     /// is rendered to.
     /// </summary>
-    public class GameBoardPanel : MonoBehaviour
+    public class GameBoardPanel : MonoBehaviour, IDisposable
     {
         /// <summary>
         /// Instance variable <c>_gameManager</c> is used to control all game moves and 
         /// game state.
         /// </summary>
         private IGameManager _gameManager;
+
+        /// <summary>
+        /// Instance variable <c>_eventBus</c> is used to manage all game events.
+        /// </summary>
+        private IEventBus _eventBus;
 
         /// <summary>
         /// Instance variable <c>_playerSettingsService</c> is used to retrieve and persist 
@@ -82,10 +89,19 @@ namespace GameHub.Games.TicTacToe2D.UI
         private Sprite _crossSprite;
 
         /// <summary>
+        /// Instance variable <c>_message</c> is used to display a game ending message.
+        /// </summary>
+        [SerializeField]
+        private TMP_Text _message;
+
+        /// <summary>
         /// Method <c>Setup</c> is responsible for wiring up depedencies on object creation.
         /// </summary>
         /// <param name="gameManager">
         /// <c>gameManager</c> is used to control all game moves and game state.
+        /// </param>
+        /// <param name="eventBus">
+        /// <c>eventBus</c> is used to manage game event subscription and notification.
         /// </param>
         /// <param name="playerSettingsService">
         /// <c>playerSettingsService</c> is used to retrieve and persist player game settings.
@@ -95,26 +111,35 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </param>
         [Inject]
         public void Setup(
-            IGameManager gameManager, 
+            IGameManager gameManager,
+            IEventBus eventBus,
             IPlayerSettingsService playerSettingsService, 
             ISceneLoader sceneLoader
         )
         {
             _gameManager = gameManager;
+            _eventBus = eventBus;
             _playerSettingsService = playerSettingsService;
             _sceneLoader = sceneLoader;
+
+            _eventBus.NewSeriesEvents.AddListener(OnNewGame);
+            _eventBus.NewGameEvents.AddListener(OnNewGame);
+            _eventBus.TieGameEvents.AddListener(OnTieGame);
+            _eventBus.PlayerClaimEvents.AddListener(OnPlayerClaim);
+            _eventBus.PlayerWinEvents.AddListener(OnPlayerWin);
         }
 
         /// <summary>
-        /// Method <c>Start</c> is used to initialize the component.
+        /// Method <c>Dispose</c> is called when the class is destroyed and we need to 
+        /// clean up dependencies.
         /// </summary>
-        private void Start()
+        public void Dispose()
         {
-            _gameManager.GetEventBus().NewSeriesEvents.AddListener(OnNewGame);
-            _gameManager.GetEventBus().NewGameEvents.AddListener(OnNewGame);
-            _gameManager.GetEventBus().TieGameEvents.AddListener(OnTieGame);
-            _gameManager.GetEventBus().PlayerClaimEvents.AddListener(OnPlayerClaim);
-            _gameManager.GetEventBus().PlayerWinEvents.AddListener(OnPlayerWin);
+            _eventBus.NewSeriesEvents.RemoveListener(OnNewGame);
+            _eventBus.NewGameEvents.RemoveListener(OnNewGame);
+            _eventBus.TieGameEvents.RemoveListener(OnTieGame);
+            _eventBus.PlayerClaimEvents.RemoveListener(OnPlayerClaim);
+            _eventBus.PlayerWinEvents.RemoveListener(OnPlayerWin);
         }
 
         /// <summary>
@@ -126,7 +151,50 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </param>
         private void OnTieGame(GameEvent eventType)
         {
+            StartCoroutine(ShowTie());
+        }
+
+        /// <summary>
+        /// Method <c>ShowTie</c> is called when a tie occurs. Displays tie game message 
+        /// and then displays the play again modal.
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerator ShowTie()
+        {
+            _boardClickEnabled = false;
+
+            if (_audioWinSource)
+            {
+                _audioWinSource.Play();
+            }
+
+            StartCoroutine(ShowMessage("Tie Game!"));
+
+            yield return new WaitForSeconds(2);
+
+            _boardClickEnabled = true;
+
             CheckPlayAgain();
+        }
+
+        /// <summary>
+        /// Method <c>ShowMessage</c> is used to display a message.
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerator ShowMessage(string message)
+        {
+            _message.text = message;
+            _message.gameObject.SetActive(true);
+            int index = 0;
+            float color = .25f;
+
+            while (color < 1)
+            {
+                _message.color = new Color(color, color, color);
+                index++;
+                color = color + (index * .1f);
+                yield return new WaitForSeconds(.05f);
+            }
         }
 
         /// <summary>
@@ -139,31 +207,36 @@ namespace GameHub.Games.TicTacToe2D.UI
         /// </param>
         private void OnPlayerWin( PlayerWinEvent eventType )
         {
-            if (_audioWinSource)
-            {
-                _audioWinSource.Play();
-            }
-            StartCoroutine(HighlightWinCells(eventType, 6, .35f));
+            StartCoroutine(ShowWin(eventType));
         }
 
         /// <summary>
-        /// Method <c>HighlightWinCells</c> is used to create a pulsing effect on the 
-        /// winning game pieces / cells.
+        /// Method <c>ShowWin</c> is called when a player wins. Displays pulsing effect on 
+        /// winning cells, displays winner text, and after a delay, displays the Play Again
+        /// modal.
         /// </summary>
         /// <param name="eventType">
         /// <c>eventType</c> is an event associated with the winning player.
         /// </param>
-        /// <param name="count">
-        /// <c>count</c> is the total number of times to pulse the winning game pieces.
-        /// </param>
-        /// <param name="delay">
-        /// <c>delay</c> is the number of seconds to delay before repeating the pulse.
-        /// </param>
         /// <returns></returns>
-        private IEnumerator HighlightWinCells( PlayerWinEvent eventType, int count, float delay )
+        private IEnumerator ShowWin( PlayerWinEvent eventType )
         {
             _boardClickEnabled = false;
 
+            if (_audioWinSource)
+            {
+                _audioWinSource.Play();
+            }
+
+            if (eventType.Player == _gameManager.GetGameSeries().Player1)
+            {
+                StartCoroutine(ShowMessage("Playe 1 Wins!"));
+            }
+            else
+            {
+                StartCoroutine(ShowMessage("Player 2 Wins!"));
+            }
+   
             Transform gameBoard = transform.Find($"GameBoard{_boardId}");
  
             Color defaultColor = eventType.Player.Settings.Color;
@@ -173,7 +246,7 @@ namespace GameHub.Games.TicTacToe2D.UI
                 (float)(defaultColor.b * 1.1)
             );
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < 6; i++)
             {
                 foreach (GameBoardCell cell in eventType.WinCells)
                 {
@@ -195,8 +268,9 @@ namespace GameHub.Games.TicTacToe2D.UI
 
                     }
                 }
-                yield return new WaitForSeconds(delay);
+                yield return new WaitForSeconds(.35f);
             }
+
             _boardClickEnabled = true;
 
             CheckPlayAgain();
@@ -253,6 +327,12 @@ namespace GameHub.Games.TicTacToe2D.UI
 
             GameBoard gameBoard = new GameBoard(settings.BoardSize);
             GameState gameState = _gameManager.InitializeGame(gameBoard, settings.LengthToWin);
+
+            if (_message)
+            {
+                _message.gameObject.SetActive(false);
+                _message.text = "";
+            }
 
             BuildGameBoard(gameState);
 
@@ -337,7 +417,7 @@ namespace GameHub.Games.TicTacToe2D.UI
                         {
                             int row = (int) rowCoordinates.x;
                             int col = (int) rowCoordinates.y;
-                            _gameManager.GetEventBus().BoardClickEvents
+                            _eventBus.BoardClickEvents
                                 .Notify(new BoardClickEvent(row, col));
                         }
                     });

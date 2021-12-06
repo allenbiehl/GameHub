@@ -1,7 +1,9 @@
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using GameHub.Games.TicTacToe2D.Event;
 using GameHub.Games.TicTacToe2D.AI;
+using Zenject;
 
 namespace GameHub.Games.TicTacToe2D
 {
@@ -9,7 +11,7 @@ namespace GameHub.Games.TicTacToe2D
     /// Class <c>GameManager</c> represents the core service for managing 
     /// all game operations and game session state.
     /// </summary>
-    public class GameManager : IGameManager
+    public class GameManager : IGameManager, IDisposable
     {
         /// <summary>
         /// Instance variable <c>_gameSeries</c> is used to store the current
@@ -24,7 +26,7 @@ namespace GameHub.Games.TicTacToe2D
         /// channels. Any entity can subscribe to an event and when that event
         /// occurs, then that entity will be notified that the event occurred.
         /// </summary>
-        private EventBus _eventBus;
+        private IEventBus _eventBus;
 
         /// <summary>
         /// Instance variable <c>_playerPathTriangulation</c> is used to check
@@ -38,11 +40,21 @@ namespace GameHub.Games.TicTacToe2D
         /// <summary>
         /// Constructor for the <c>GameManager</c>.
         /// </summary>
-        private GameManager()
+        [Inject]
+        private GameManager(IEventBus eventBus)
         {
-            _eventBus = new EventBus();
+            _eventBus = eventBus;
             _eventBus.BoardClickEvents.AddListener(OnBoardClick);
             _playerPathTriangulation = new PlayerPathTriangulation();
+        }
+
+        /// <summary>
+        /// Method <c>Dispose</c> is called when the class is destroyed and we need to 
+        /// clean up dependencies.
+        /// </summary>
+        public void Dispose()
+        {
+            _eventBus.BoardClickEvents.RemoveListener(OnBoardClick);
         }
 
         /// <summary>
@@ -55,18 +67,6 @@ namespace GameHub.Games.TicTacToe2D
         public GameSeries GetGameSeries()
         {
             return _gameSeries;
-        }
-
-        /// <summary>
-        /// Method <c>GetEventBus</c> provides channels for notifying listeners
-        /// when particular events occur. 
-        /// </summary>
-        /// <returns>
-        /// <c>EventBus</c> is responsible for centrally managing event channels.
-        /// </returns>
-        public EventBus GetEventBus()
-        {
-            return _eventBus;
         }
 
         /// <summary>

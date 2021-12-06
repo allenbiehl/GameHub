@@ -33,7 +33,7 @@ namespace GameHub.Games.TicTacToe2D.AI
         {
             get
             {
-                return new ExpertComputerPlayer(
+                return new BeginnerComputerPlayer(
                     new UserInfo("0", "AI", "Artificial", "Intelligence"),
                     PlayerSettings.Omega
                 );
